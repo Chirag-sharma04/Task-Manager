@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # Frontend (Next.js)
+  frontend:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - API_URL=http://backend:5000
+    depends_on:
+      - backend
+      - redis
+    networks:
+      - task-manager-network
+
+  # Backend (Express.js)
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/taskmanager
+      - POSTGRES_URL=postgresql://postgres:password@postgres:5432/taskmanager
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - mongodb
+      - postgres
+      - redis
+    networks:
+      - task-manager-network
+
+  # MongoDB
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - task-manager-network
+
+  # PostgreSQL
+  postgres:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=taskmanager
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - task-manager-network
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - task-manager-network
+
+volumes:
+  mongodb_data:
+  postgres_data:
+  redis_data:
+
+networks:
+  task-manager-network:
+    driver: bridge
