@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -41,6 +40,16 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --color-coral-50: oklch(0.98 0.02 15);
+  --color-coral-100: oklch(0.95 0.04 15);
+  --color-coral-200: oklch(0.9 0.08 15);
+  --color-coral-300: oklch(0.8 0.12 15);
+  --color-coral-400: oklch(0.7 0.16 15);
+  --color-coral-500: oklch(0.65 0.2 15);
+  --color-coral-600: oklch(0.6 0.18 15);
+  --color-coral-700: oklch(0.5 0.16 15);
+  --color-coral-800: oklch(0.4 0.14 15);
+  --color-coral-900: oklch(0.3 0.12 15);
 }
 
 :root {
@@ -118,5 +127,159 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  }
+}
+
+/* Custom coral color utilities for task manager */
+@layer utilities {
+  .text-coral-500 {
+    color: #ff6b6b;
+  }
+
+  .bg-coral-500 {
+    background-color: #ff6b6b;
+  }
+
+  .hover\:bg-coral-600:hover {
+    background-color: #e85a5a;
+  }
+
+  .border-coral-500 {
+    border-color: #ff6b6b;
+  }
+
+  .ring-coral-500 {
+    --tw-ring-color: #ff6b6b;
+  }
+
+  .hover\:bg-coral-50:hover {
+    background-color: #fef7f7;
+  }
+
+  /* Dark mode coral hover states */
+  .dark .hover\:bg-coral-900\/20:hover {
+    background-color: rgba(148, 42, 42, 0.2);
+  }
+
+  .dark .hover\:bg-coral-50:hover {
+    background-color: rgba(255, 107, 107, 0.1);
+  }
+
+  /* Ensure coral colors work in dark mode */
+  .dark .text-coral-500 {
+    color: #ff6b6b;
+  }
+
+  .dark .bg-coral-500 {
+    background-color: #ff6b6b;
+  }
+
+  .dark .border-coral-500 {
+    border-color: #ff6b6b;
+  }
+
+  /* Task manager specific overrides for better dark mode */
+  .dark .bg-gray-50 {
+    background-color: oklch(0.129 0.042 264.695);
+  }
+
+  .dark .bg-white {
+    background-color: oklch(0.208 0.042 265.755);
+  }
+
+  .dark .bg-gray-100 {
+    background-color: oklch(0.279 0.041 260.031);
+  }
+
+  .dark .bg-gray-800 {
+    background-color: oklch(0.208 0.042 265.755);
+  }
+
+  .dark .bg-gray-700 {
+    background-color: oklch(0.279 0.041 260.031);
+  }
+
+  .dark .bg-gray-600 {
+    background-color: oklch(0.35 0.04 260);
+  }
+
+  .dark .border-gray-200 {
+    border-color: oklch(1 0 0 / 10%);
+  }
+
+  .dark .border-gray-600 {
+    border-color: oklch(1 0 0 / 15%);
+  }
+
+  .dark .border-gray-700 {
+    border-color: oklch(1 0 0 / 10%);
+  }
+
+  .dark .text-black {
+    color: oklch(0.984 0.003 247.858);
+  }
+
+  .dark .text-white {
+    color: oklch(0.984 0.003 247.858);
+  }
+
+  .dark .text-gray-300 {
+    color: oklch(0.704 0.04 256.788);
+  }
+
+  .dark .text-gray-400 {
+    color: oklch(0.6 0.04 256.788);
+  }
+
+  .dark .text-gray-500 {
+    color: oklch(0.554 0.046 257.417);
+  }
+
+  .dark .text-gray-600 {
+    color: oklch(0.704 0.04 256.788);
+  }
+
+  .dark .text-gray-900 {
+    color: oklch(0.984 0.003 247.858);
+  }
+
+  /* Input styling for dark mode */
+  .dark input {
+    background-color: oklch(1 0 0 / 15%);
+    border-color: oklch(1 0 0 / 10%);
+    color: oklch(0.984 0.003 247.858);
+  }
+
+  .dark input::placeholder {
+    color: oklch(0.704 0.04 256.788);
+  }
+
+  /* Table styling for dark mode */
+  .dark table thead {
+    background-color: oklch(0.279 0.041 260.031);
+  }
+
+  .dark table tbody {
+    background-color: oklch(0.208 0.042 265.755);
+  }
+
+  .dark table tbody tr {
+    border-color: oklch(1 0 0 / 10%);
+  }
+
+  /* Button specific dark mode styles */
+  .dark button[class*="border-coral-500"] {
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+  }
+
+  .dark button[class*="bg-coral-500"] {
+    background-color: #ff6b6b;
+    color: white;
+  }
+
+  .dark button[class*="bg-coral-500"]:hover {
+    background-color: #e85a5a;
   }
 }

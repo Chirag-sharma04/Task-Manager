@@ -23,54 +23,58 @@ import {
 } from "lucide-react"
 import Image from "next/image"
 
-interface VitalTask {
+interface MyTask {
   id: string
   title: string
   description: string
-  priority: "Extreme" | "High"
+  priority: "Extreme" | "Ultimate" | "High" | "Moderate" | "Low"
   status: "Not Started" | "In Progress" | "Completed"
   createdAt: string
   image?: string
-  detailedSteps?: string[]
+  objective?: string
+  taskDescription?: string
+  additionalNotes?: string[]
+  deadline?: string
 }
 
-const vitalTasks: VitalTask[] = [
+const myTasks: MyTask[] = [
   {
-    id: "v1",
-    title: "Walk the dog",
-    description: "Take the dog to the park and bring treats as well.",
+    id: "mt1",
+    title: "Submit Documents",
+    description: "Make sure to submit all the necessary documents...",
     priority: "Extreme",
     status: "Not Started",
     createdAt: "20/08/2023",
     image: "/placeholder.svg",
-    detailedSteps: [
-      "Listen to a podcast or audiobook",
-      "Practice mindfulness or meditation",
-      "Take photos of interesting sights along the way",
-      "Practice obedience training with your dog",
-      "Chat with neighbors or other dog walkers",
-      "Listen to music or an upbeat playlist",
+    objective: "To submit required documents for something important.",
+    taskDescription:
+      "Review the list of documents required for submission and ensure all necessary documents are ready. Organize the documents accordingly and scan them if physical copies need to be submitted digitally. Rename the scanned files appropriately for easy identification and verify the accepted file formats. Upload the documents securely to the designated platform, double-check for accuracy, and obtain confirmation of successful submission. Follow up if necessary to ensure proper processing.",
+    additionalNotes: [
+      "Ensure that the documents are authentic and up-to-date.",
+      "Maintain confidentiality and security of sensitive information during the submission process.",
+      "If there are specific guidelines or deadlines for submission, adhere to them diligently.",
     ],
+    deadline: "End of Day",
   },
   {
-    id: "v2",
-    title: "Take grandma to hospital",
-    description: "Go back home and take grandma to the hosp...",
-    priority: "Extreme",
+    id: "mt2",
+    title: "Complete assignments",
+    description: "The assignments must be completed by end of year...",
+    priority: "Ultimate",
     status: "In Progress",
     createdAt: "20/08/2023",
     image: "/placeholder.svg",
   },
 ]
 
-export default function VitalTasks() {
-  const [selectedTask, setSelectedTask] = useState<VitalTask>(vitalTasks[0])
+export default function MyTasks() {
+  const [selectedTask, setSelectedTask] = useState<MyTask>(myTasks[0])
   const router = useRouter()
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", active: false, route: "/" },
-    { icon: Zap, label: "Vital Task", active: true, route: "/vital" },
-    { icon: CheckSquare, label: "My Task", active: false, route: "/tasks" },
+    { icon: Zap, label: "Vital Task", active: false, route: "/vital" },
+    { icon: CheckSquare, label: "My Task", active: true, route: "/tasks" },
     { icon: Grid3X3, label: "Task Categories", active: false, route: "/categories" },
     { icon: Settings, label: "Settings", active: false, route: "/settings" },
     { icon: HelpCircle, label: "Help", active: false, route: "/help" },
@@ -81,7 +85,20 @@ export default function VitalTasks() {
   }
 
   const getPriorityColor = (priority: string) => {
-    return priority === "Extreme" ? "text-red-500" : "text-orange-500"
+    switch (priority) {
+      case "Ultimate":
+        return "text-purple-600"
+      case "Extreme":
+        return "text-red-500"
+      case "High":
+        return "text-orange-500"
+      case "Moderate":
+        return "text-yellow-500"
+      case "Low":
+        return "text-green-500"
+      default:
+        return "text-gray-500"
+    }
   }
 
   const getStatusColor = (status: string) => {
@@ -190,14 +207,14 @@ export default function VitalTasks() {
         {/* Main Content */}
         <main className="flex-1 p-6 overflow-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
-            {/* Vital Tasks List */}
+            {/* My Tasks List */}
             <div>
               <Card className="h-full dark:bg-gray-800 dark:border-gray-700">
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold mb-6 dark:text-white">Vital Tasks</h2>
+                  <h2 className="text-lg font-semibold mb-6 dark:text-white">My Tasks</h2>
 
                   <div className="space-y-4">
-                    {vitalTasks.map((task) => (
+                    {myTasks.map((task) => (
                       <Card
                         key={task.id}
                         className={`cursor-pointer transition-all hover:shadow-md ${
@@ -293,8 +310,8 @@ export default function VitalTasks() {
                   </div>
 
                   {/* Task Info */}
-                  <div className="mb-6">
-                    <div className="flex items-center gap-4 text-sm mb-4">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4 text-sm">
                       <span className={`font-medium ${getPriorityColor(selectedTask.priority)}`}>
                         Priority: {selectedTask.priority}
                       </span>
@@ -302,32 +319,57 @@ export default function VitalTasks() {
                         Status: {selectedTask.status}
                       </span>
                     </div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                      Take the dog to the park and bring treats as well.
-                    </p>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                      Take Luffy and Jiro for a leisurely stroll around the neighbourhood. Enjoy the fresh air and give
-                      them the exercise and mental stimulation they need for a happy and healthy day. Do not forget to
-                      bring along squeaky and fluffy for some extra fun along the way!
-                    </p>
-                  </div>
 
-                  {/* Detailed Steps */}
-                  {selectedTask.detailedSteps && (
-                    <div>
-                      <h3 className="font-medium text-sm mb-3 dark:text-white">Activities:</h3>
-                      <ol className="space-y-2">
-                        {selectedTask.detailedSteps.map((step, index) => (
-                          <li key={index} className="text-sm text-gray-600 dark:text-gray-400 flex gap-2">
-                            <span className="text-coral-500 font-medium">{index + 1}.</span>
-                            <span>{step}</span>
-                          </li>
-                        ))}
-                      </ol>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      <span className="text-gray-400">Created on: {selectedTask.createdAt}</span>
                     </div>
-                  )}
 
-                  <div className="mt-6 text-xs text-gray-400">Created on: 20/08/2023</div>
+                    {selectedTask.objective && (
+                      <div>
+                        <h3 className="font-medium text-sm mb-2 dark:text-white">
+                          <strong>Task Title:</strong> Document Submission
+                        </h3>
+                        <h4 className="font-medium text-sm mb-2 dark:text-white">
+                          <strong>Objective:</strong>
+                        </h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{selectedTask.objective}</p>
+                      </div>
+                    )}
+
+                    {selectedTask.taskDescription && (
+                      <div>
+                        <h4 className="font-medium text-sm mb-2 dark:text-white">
+                          <strong>Task Description:</strong>
+                        </h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{selectedTask.taskDescription}</p>
+                      </div>
+                    )}
+
+                    {selectedTask.additionalNotes && (
+                      <div>
+                        <h4 className="font-medium text-sm mb-2 dark:text-white">
+                          <strong>Additional Notes:</strong>
+                        </h4>
+                        <ul className="space-y-2">
+                          {selectedTask.additionalNotes.map((note, index) => (
+                            <li key={index} className="text-sm text-gray-600 dark:text-gray-400 flex gap-2">
+                              <span className="text-coral-500">•</span>
+                              <span>{note}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {selectedTask.deadline && (
+                      <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <h4 className="font-medium text-sm mb-1 dark:text-white">
+                          <strong>Deadline for Submission:</strong>
+                        </h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{selectedTask.deadline}</p>
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             </div>
