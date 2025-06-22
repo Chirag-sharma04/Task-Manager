@@ -20,6 +20,8 @@ import {
   LogOut,
   Edit,
   Trash2,
+  Menu,
+  X,
 } from "lucide-react"
 import Image from "next/image"
 
@@ -65,6 +67,7 @@ const vitalTasks: VitalTask[] = [
 
 export default function VitalTasks() {
   const [selectedTask, setSelectedTask] = useState<VitalTask>(vitalTasks[0])
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const router = useRouter()
 
   const menuItems = [
@@ -78,6 +81,7 @@ export default function VitalTasks() {
 
   const handleNavigation = (route: string) => {
     router.push(route)
+    setIsSidebarOpen(false)
   }
 
   const getPriorityColor = (priority: string) => {
@@ -98,65 +102,97 @@ export default function VitalTasks() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 relative">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
+      )}
+
       {/* Sidebar */}
-      <div className="w-64 bg-black dark:bg-gray-950 text-white flex flex-col">
+      <div
+        className={`${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 w-64 bg-black dark:bg-gray-950 text-white flex flex-col transition-transform duration-300 ease-in-out`}
+      >
+        {/* Mobile Close Button */}
+        <div className="lg:hidden flex justify-end p-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsSidebarOpen(false)}
+            className="text-white hover:bg-gray-800"
+          >
+            <X className="w-5 h-5" />
+          </Button>
+        </div>
+
         {/* User Profile */}
-        <div className="p-6 text-center">
-          <Avatar className="w-16 h-16 mx-auto mb-3">
+        <div className="p-4 lg:p-6 text-center">
+          <Avatar className="w-12 h-12 lg:w-16 lg:h-16 mx-auto mb-3">
             <AvatarImage src="/placeholder.svg" />
             <AvatarFallback className="bg-coral-500 text-white">AM</AvatarFallback>
           </Avatar>
-          <h3 className="font-semibold text-lg">amanuel</h3>
-          <p className="text-gray-400 text-sm">amanuel@gmail.com</p>
+          <h3 className="font-semibold text-base lg:text-lg">amanuel</h3>
+          <p className="text-gray-400 text-xs lg:text-sm">amanuel@gmail.com</p>
         </div>
 
         {/* Navigation Menu */}
-        <nav className="flex-1 px-4">
+        <nav className="flex-1 px-3 lg:px-4">
           {menuItems.map((item) => (
             <button
               key={item.label}
               onClick={() => handleNavigation(item.route)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 text-left transition-colors ${
+              className={`w-full flex items-center gap-3 px-3 lg:px-4 py-2 lg:py-3 rounded-lg mb-2 text-left transition-colors text-sm lg:text-base ${
                 item.active ? "bg-coral-500 text-white" : "text-gray-300 hover:bg-gray-800 dark:hover:bg-gray-800"
               }`}
             >
-              <item.icon className="w-5 h-5" />
+              <item.icon className="w-4 h-4 lg:w-5 lg:h-5" />
               <span>{item.label}</span>
             </button>
           ))}
         </nav>
 
         {/* Logout */}
-        <div className="p-4">
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-800 dark:hover:bg-gray-800 rounded-lg">
-            <LogOut className="w-5 h-5" />
+        <div className="p-3 lg:p-4">
+          <button className="w-full flex items-center gap-3 px-3 lg:px-4 py-2 lg:py-3 text-gray-300 hover:bg-gray-800 dark:hover:bg-gray-800 rounded-lg text-sm lg:text-base">
+            <LogOut className="w-4 h-4 lg:w-5 lg:h-5" />
             <span>Logout</span>
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 lg:px-6 py-3 lg:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <h1 className="text-2xl font-bold">
+            <div className="flex items-center gap-3 lg:gap-6 min-w-0 flex-1">
+              {/* Mobile Menu Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsSidebarOpen(true)}
+                className="lg:hidden text-gray-600 dark:text-gray-300"
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
+
+              <h1 className="text-xl lg:text-2xl font-bold">
                 <span className="text-coral-500">To-</span>
                 <span className="text-black dark:text-white">Do</span>
               </h1>
 
-              <div className="relative">
+              {/* Search - Hidden on small screens */}
+              <div className="relative hidden md:block">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
                   placeholder="Search your task here..."
-                  className="pl-10 w-80 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                  className="pl-10 w-60 lg:w-80 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                 />
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 lg:gap-4">
               <Button size="sm" className="bg-coral-500 hover:bg-coral-600">
                 <Search className="w-4 h-4" />
               </Button>
@@ -164,7 +200,7 @@ export default function VitalTasks() {
               <Button
                 size="sm"
                 variant="outline"
-                className="border-coral-500 text-coral-500 hover:bg-coral-50 dark:hover:bg-coral-900/20"
+                className="hidden sm:flex border-coral-500 text-coral-500 hover:bg-coral-50 dark:hover:bg-coral-900/20"
               >
                 <Bell className="w-4 h-4" />
               </Button>
@@ -172,31 +208,40 @@ export default function VitalTasks() {
               <Button
                 size="sm"
                 variant="outline"
-                className="border-coral-500 text-coral-500 hover:bg-coral-50 dark:hover:bg-coral-900/20"
+                className="hidden sm:flex border-coral-500 text-coral-500 hover:bg-coral-50 dark:hover:bg-coral-900/20"
               >
                 <Calendar className="w-4 h-4" />
               </Button>
 
               <ThemeToggle />
 
-              <div className="text-right">
+              <div className="text-right hidden sm:block">
                 <p className="text-sm font-medium dark:text-white">Tuesday</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">20/08/2023</p>
               </div>
             </div>
           </div>
+
+          {/* Mobile Search Bar */}
+          <div className="relative mt-3 md:hidden">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Search your task here..."
+              className="pl-10 w-full bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+            />
+          </div>
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 p-6 overflow-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+        <main className="flex-1 p-3 lg:p-6 overflow-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 h-full">
             {/* Vital Tasks List */}
             <div>
               <Card className="h-full dark:bg-gray-800 dark:border-gray-700">
-                <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold mb-6 dark:text-white">Vital Tasks</h2>
+                <CardContent className="p-4 lg:p-6">
+                  <h2 className="text-base lg:text-lg font-semibold mb-4 lg:mb-6 dark:text-white">Vital Tasks</h2>
 
-                  <div className="space-y-4">
+                  <div className="space-y-3 lg:space-y-4">
                     {vitalTasks.map((task) => (
                       <Card
                         key={task.id}
@@ -207,12 +252,12 @@ export default function VitalTasks() {
                         } dark:bg-gray-700`}
                         onClick={() => setSelectedTask(task)}
                       >
-                        <CardContent className="p-4">
-                          <div className="flex gap-4">
-                            <div className="flex-1">
+                        <CardContent className="p-3 lg:p-4">
+                          <div className="flex gap-3 lg:gap-4">
+                            <div className="flex-1 min-w-0">
                               <div className="flex items-start gap-2 mb-2">
                                 <div
-                                  className={`w-3 h-3 rounded-full mt-1 ${
+                                  className={`w-2 h-2 lg:w-3 lg:h-3 rounded-full mt-1 flex-shrink-0 ${
                                     task.status === "Not Started"
                                       ? "bg-red-500"
                                       : task.status === "In Progress"
@@ -220,30 +265,34 @@ export default function VitalTasks() {
                                         : "bg-green-500"
                                   }`}
                                 />
-                                <div className="flex-1">
-                                  <h3 className="font-medium text-sm mb-1 dark:text-white">{task.title}</h3>
-                                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">{task.description}</p>
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-medium text-sm lg:text-base mb-1 dark:text-white truncate">
+                                    {task.title}
+                                  </h3>
+                                  <p className="text-xs lg:text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                                    {task.description}
+                                  </p>
 
-                                  <div className="flex items-center gap-4 text-xs">
+                                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs">
                                     <span className={`font-medium ${getPriorityColor(task.priority)}`}>
                                       Priority: {task.priority}
                                     </span>
                                     <span className={`font-medium ${getStatusColor(task.status)}`}>
                                       Status: {task.status}
                                     </span>
-                                    <span className="text-gray-400">Created on: {task.createdAt}</span>
+                                    <span className="text-gray-400 hidden sm:inline">Created on: {task.createdAt}</span>
                                   </div>
                                 </div>
                               </div>
                             </div>
 
-                            <div className="w-12 h-12 bg-gray-100 dark:bg-gray-600 rounded-lg flex-shrink-0">
+                            <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gray-100 dark:bg-gray-600 rounded-lg flex-shrink-0">
                               <Image
                                 src={task.image || "/placeholder.svg"}
                                 alt={task.title}
-                                width={48}
-                                height={48}
-                                className="w-full h-full object-cover rounded-lg"
+                                width={60}
+                                height={60}
+                                className="object-cover rounded-lg"
                               />
                             </div>
                           </div>
@@ -258,43 +307,48 @@ export default function VitalTasks() {
             {/* Task Detail View */}
             <div>
               <Card className="h-full dark:bg-gray-800 dark:border-gray-700">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-lg font-semibold dark:text-white">{selectedTask.title}</h2>
+                <CardContent className="p-4 lg:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 lg:mb-6 gap-3">
+                    <h2 className="text-base lg:text-lg font-semibold dark:text-white truncate">
+                      {selectedTask.title}
+                    </h2>
                     <div className="flex gap-2">
                       <Button
                         size="sm"
                         variant="outline"
-                        className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                        className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 text-xs"
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="w-3 h-3 lg:w-4 lg:h-4 mr-1" />
+                        <span className="hidden sm:inline">Edit</span>
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        className="text-red-600 hover:text-red-700 dark:border-red-600 dark:text-red-400"
+                        className="text-red-600 hover:text-red-700 dark:border-red-600 dark:text-red-400 text-xs"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3 h-3 lg:w-4 lg:h-4 mr-1" />
+                        <span className="hidden sm:inline">Delete</span>
                       </Button>
                     </div>
                   </div>
 
                   {/* Task Image */}
-                  <div className="mb-6">
-                    <div className="w-full h-48 bg-gray-100 dark:bg-gray-600 rounded-lg overflow-hidden">
+                  <div className="mb-4 lg:mb-6">
+                    <div className="w-full h-32 lg:h-48 bg-gray-100 dark:bg-gray-600 rounded-lg overflow-hidden">
                       <Image
                         src={selectedTask.image || "/placeholder.svg"}
                         alt={selectedTask.title}
-                        width={400}
-                        height={192}
+                        width={60}
+                        height={60}
+                
                         className="w-full h-full object-cover"
                       />
                     </div>
                   </div>
 
                   {/* Task Info */}
-                  <div className="mb-6">
-                    <div className="flex items-center gap-4 text-sm mb-4">
+                  <div className="mb-4 lg:mb-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs lg:text-sm mb-4">
                       <span className={`font-medium ${getPriorityColor(selectedTask.priority)}`}>
                         Priority: {selectedTask.priority}
                       </span>
@@ -302,12 +356,12 @@ export default function VitalTasks() {
                         Status: {selectedTask.status}
                       </span>
                     </div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                    <p className="text-gray-600 dark:text-gray-400 text-xs lg:text-sm mb-4">
                       Take the dog to the park and bring treats as well.
                     </p>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                    <p className="text-gray-600 dark:text-gray-400 text-xs lg:text-sm mb-4">
                       Take Luffy and Jiro for a leisurely stroll around the neighbourhood. Enjoy the fresh air and give
-                      them the exercise and mental stimulation they need for a happy and healthy day. Do not forget to
+                      them the exercise and mental stimulation they need for a happy and healthy day. Don't forget to
                       bring along squeaky and fluffy for some extra fun along the way!
                     </p>
                   </div>
@@ -315,11 +369,11 @@ export default function VitalTasks() {
                   {/* Detailed Steps */}
                   {selectedTask.detailedSteps && (
                     <div>
-                      <h3 className="font-medium text-sm mb-3 dark:text-white">Activities:</h3>
+                      <h3 className="font-medium text-sm lg:text-base mb-3 dark:text-white">Activities:</h3>
                       <ol className="space-y-2">
                         {selectedTask.detailedSteps.map((step, index) => (
-                          <li key={index} className="text-sm text-gray-600 dark:text-gray-400 flex gap-2">
-                            <span className="text-coral-500 font-medium">{index + 1}.</span>
+                          <li key={index} className="text-xs lg:text-sm text-gray-600 dark:text-gray-400 flex gap-2">
+                            <span className="text-coral-500 font-medium flex-shrink-0">{index + 1}.</span>
                             <span>{step}</span>
                           </li>
                         ))}
@@ -327,7 +381,7 @@ export default function VitalTasks() {
                     </div>
                   )}
 
-                  <div className="mt-6 text-xs text-gray-400">Created on: 20/08/2023</div>
+                  <div className="mt-4 lg:mt-6 text-xs text-gray-400">Created on: 20/08/2023</div>
                 </CardContent>
               </Card>
             </div>

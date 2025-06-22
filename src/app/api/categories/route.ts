@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
         },
       })
     }
-  } catch (error) {
+  } catch {
     return NextResponse.json({ success: false, error: "Failed to fetch categories" }, { status: 500 })
   }
 }
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     if (type === "status") {
       const newStatus: TaskStatus = {
-        id: taskStatuses.length + 1,
+        id: Math.max(...taskStatuses.map((s) => s.id), 0) + 1,
         name,
         createdAt: new Date().toISOString(),
       }
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       )
     } else if (type === "priority") {
       const newPriority: TaskPriority = {
-        id: taskPriorities.length + 1,
+        id: Math.max(...taskPriorities.map((p) => p.id), 0) + 1,
         name,
         createdAt: new Date().toISOString(),
       }
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json({ success: false, error: "Invalid type specified" }, { status: 400 })
     }
-  } catch (error) {
+  } catch  {
     return NextResponse.json({ success: false, error: "Failed to create category" }, { status: 500 })
   }
 }

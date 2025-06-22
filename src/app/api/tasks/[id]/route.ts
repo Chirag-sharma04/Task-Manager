@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import connectDB from "@/lib/mongodb"
-import MyTask from "@/models/MyTask"
+import Task from "@/models/Task"
 import mongoose from "mongoose"
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
@@ -11,18 +11,18 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ success: false, error: "Invalid task ID" }, { status: 400 })
     }
 
-    const myTask = await MyTask.findById(params.id).lean()
+    const task = await Task.findById(params.id).lean()
 
-    if (!myTask) {
+    if (!task) {
       return NextResponse.json({ success: false, error: "Task not found" }, { status: 404 })
     }
 
     return NextResponse.json({
       success: true,
-      data: myTask,
+      data: task,
     })
   } catch (error) {
-    console.error("Error fetching my task:", error)
+    console.error("Error fetching task:", error)
     return NextResponse.json({ success: false, error: "Failed to fetch task" }, { status: 500 })
   }
 }
@@ -37,26 +37,27 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const body = await request.json()
 
-    const updatedMyTask = await MyTask.findByIdAndUpdate(
+    const updatedTask = await Task.findByIdAndUpdate(
       params.id,
       {
         ...body,
+        dueDate: body.dueDate ? new Date(body.dueDate) : undefined,
         updatedAt: new Date(),
       },
       { new: true, runValidators: true },
     ).lean()
 
-    if (!updatedMyTask) {
+    if (!updatedTask) {
       return NextResponse.json({ success: false, error: "Task not found" }, { status: 404 })
     }
 
     return NextResponse.json({
       success: true,
-      data: updatedMyTask,
+      data: updatedTask,
       message: "Task updated successfully",
     })
   } catch (error) {
-    console.error("Error updating my task:", error)
+    console.error("Error updating task:", error)
     return NextResponse.json({ success: false, error: "Failed to update task" }, { status: 500 })
   }
 }
@@ -69,19 +70,19 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return NextResponse.json({ success: false, error: "Invalid task ID" }, { status: 400 })
     }
 
-    const deletedMyTask = await MyTask.findByIdAndDelete(params.id).lean()
+    const deletedTask = await Task.findByIdAndDelete(params.id).lean()
 
-    if (!deletedMyTask) {
+    if (!deletedTask) {
       return NextResponse.json({ success: false, error: "Task not found" }, { status: 404 })
     }
 
     return NextResponse.json({
       success: true,
-      data: deletedMyTask,
+      data: deletedTask,
       message: "Task deleted successfully",
     })
   } catch (error) {
-    console.error("Error deleting my task:", error)
+    console.error("Error deleting task:", error)
     return NextResponse.json({ success: false, error: "Failed to delete task" }, { status: 500 })
   }
 }

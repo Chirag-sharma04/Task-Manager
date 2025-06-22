@@ -1,93 +1,87 @@
 import { type NextRequest, NextResponse } from "next/server"
-
-// Mock data - in a real app, this would come from a database
-const vitalTasks = [
-  {
-    id: "v1",
-    title: "Walk the dog",
-    description: "Take the dog to the park and bring treats as well.",
-    priority: "Extreme",
-    status: "Not Started",
-    createdAt: "2023-08-20T00:00:00Z",
-    image: "/placeholder.svg",
-    detailedSteps: [
-      "Listen to a podcast or audiobook",
-      "Practice mindfulness or meditation",
-      "Take photos of interesting sights along the way",
-      "Practice obedience training with your dog",
-      "Chat with neighbors or other dog walkers",
-      "Listen to music or an upbeat playlist",
-    ],
-  },
-  {
-    id: "v2",
-    title: "Take grandma to hospital",
-    description: "Go back home and take grandma to the hospital for her appointment.",
-    priority: "Extreme",
-    status: "In Progress",
-    createdAt: "2023-08-20T00:00:00Z",
-    image: "/placeholder.svg",
-  },
-]
+import connectDB from "@/lib/mongodb"
+import VitalTask from "@/models/VitalTask"
+import mongoose from "mongoose"
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const task = vitalTasks.find((t) => t.id === params.id)
+    await connectDB()
 
-    if (!task) {
+    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+      return NextResponse.json({ success: false, error: "Invalid vital task ID" }, { status: 400 })
+    }
+
+    const vitalTask = await VitalTask.findById(params.id).lean()
+
+    if (!vitalTask) {
       return NextResponse.json({ success: false, error: "Vital task not found" }, { status: 404 })
     }
 
     return NextResponse.json({
       success: true,
-      data: task,
+      data: vitalTask,
     })
-  } catch {
+  } catch (error) {
+    console.error("Error fetching vital task:", error)
     return NextResponse.json({ success: false, error: "Failed to fetch vital task" }, { status: 500 })
   }
 }
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const body = await request.json()
-    const taskIndex = vitalTasks.findIndex((t) => t.id === params.id)
+    await connectDB()
 
-    if (taskIndex === -1) {
-      return NextResponse.json({ success: false, error: "Vital task not found" }, { status: 404 })
+    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+      return NextResponse.json({ success: false, error: "Invalid vital task ID" }, { status: 400 })
     }
 
-    vitalTasks[taskIndex] = {
-      ...vitalTasks[taskIndex],
-      ...body,
-      updatedAt: new Date().toISOString(),
+    const body = await request.json()
+
+    const updatedVitalTask = await VitalTask.findByIdAndUpdate(
+      params.id,
+      {
+        ...body,
+        updatedAt: new Date(),
+      },
+      { new: true, runValidators: true },
+    ).lean()
+
+    if (!updatedVitalTask) {
+      return NextResponse.json({ success: false, error: "Vital task not found" }, { status: 404 })
     }
 
     return NextResponse.json({
       success: true,
-      data: vitalTasks[taskIndex],
+      data: updatedVitalTask,
       message: "Vital task updated successfully",
     })
-  } catch {
+  } catch (error) {
+    console.error("Error updating vital task:", error)
     return NextResponse.json({ success: false, error: "Failed to update vital task" }, { status: 500 })
   }
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const taskIndex = vitalTasks.findIndex((t) => t.id === params.id)
+    await connectDB()
 
-    if (taskIndex === -1) {
+    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+      return NextResponse.json({ success: false, error: "Invalid vital task ID" }, { status: 400 })
+    }
+
+    const deletedVitalTask = await VitalTask.findByIdAndDelete(params.id).lean()
+
+    if (!deletedVitalTask) {
       return NextResponse.json({ success: false, error: "Vital task not found" }, { status: 404 })
     }
 
-    const deletedTask = vitalTasks.splice(taskIndex, 1)[0]
-
     return NextResponse.json({
       success: true,
-      data: deletedTask,
+      data: deletedVitalTask,
       message: "Vital task deleted successfully",
     })
-  } catch {
+  } catch (error) {
+    console.error("Error deleting vital task:", error)
     return NextResponse.json({ success: false, error: "Failed to delete vital task" }, { status: 500 })
   }
 }
