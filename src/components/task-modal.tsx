@@ -10,7 +10,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Calendar, Upload, X } from "lucide-react"
 import { useApi } from "@/hooks/use-api"
-import Image from "next/image"
 
 interface Task {
   _id?: string
@@ -257,7 +256,7 @@ export default function TaskModal({ isOpen, onClose, task, onSuccess }: TaskModa
               >
                 {imagePreview ? (
                   <div className="relative">
-                    <Image
+                    <img
                       src={imagePreview || "/placeholder.svg"}
                       alt="Preview"
                       className="w-full h-24 lg:h-32 object-cover rounded-lg mb-2"

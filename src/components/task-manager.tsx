@@ -9,6 +9,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ThemeToggle } from "@/components/theme-toggle"
 import TaskModal from "@/components/task-modal"
+import NotificationsWidget from "@/components/notifications-widget";
+import { CalendarWidget } from "@/components/calendar-widget"
 import { useApi } from "@/hooks/use-api"
 import {
   Search,
@@ -51,6 +53,8 @@ export default function TaskManager() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const router = useRouter()
+  const [showNotification, setShowNotification] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
 
   // Create separate API instances to avoid dependency issues
   const { get } = useApi()
@@ -261,16 +265,21 @@ export default function TaskManager() {
                 size="sm"
                 variant="outline"
                 className="hidden sm:flex border-coral-500 text-coral-500 hover:bg-coral-50 dark:hover:bg-coral-900/20"
+                onClick={() => setShowNotification(!showNotification)}
               >
-                <Bell className="w-4 h-4" />
-              </Button>
 
+                <Bell className="w-4 h-4" />
+              <NotificationsWidget isOpen={showNotification} onClose={() => setShowNotification(false)} />
+              </Button>
+              
               <Button
                 size="sm"
                 variant="outline"
                 className="hidden sm:flex border-coral-500 text-coral-500 hover:bg-coral-50 dark:hover:bg-coral-900/20"
+                onClick={() => setShowCalendar(!showCalendar)}
               >
                 <Calendar className="w-4 h-4" />
+              <CalendarWidget isOpen={showCalendar} onClose={() => setShowCalendar(false)} />
               </Button>
 
               <ThemeToggle />

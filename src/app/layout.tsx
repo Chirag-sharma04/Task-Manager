@@ -1,15 +1,26 @@
 import type React from "react"
-import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Personal Task Manager",
-  description: "A comprehensive task management application",
-}
+  description: "Organize tasks efficiently.",
+  openGraph: {
+    title: "Personal Task Manager",
+    description: "Organize tasks efficiently.",
+    images: ["/og-image.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Personal Task Manager",
+    images: ["/og-image.png"],
+  },
+};
+
 
 export default function RootLayout({
   children,
@@ -21,6 +32,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
