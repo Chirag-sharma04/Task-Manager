@@ -3,15 +3,16 @@ import connectDB from "@/lib/mongodb"
 import Task from "@/models/Task"
 import mongoose from "mongoose"
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{id: string }> }) {
+  const { id } = await params;
   try {
     await connectDB()
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ success: false, error: "Invalid task ID" }, { status: 400 })
     }
 
-    const task = await Task.findById(params.id).lean()
+    const task = await Task.findById(id).lean()
 
     if (!task) {
       return NextResponse.json({ success: false, error: "Task not found" }, { status: 404 })
@@ -27,21 +28,21 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{id: string }> }) {
+  const { id } = await params;
   try {
     await connectDB()
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ success: false, error: "Invalid task ID" }, { status: 400 })
     }
 
     const body = await request.json()
 
     const updatedTask = await Task.findByIdAndUpdate(
-      params.id,
+      id,
       {
         ...body,
-        dueDate: body.dueDate ? new Date(body.dueDate) : undefined,
         updatedAt: new Date(),
       },
       { new: true, runValidators: true },
@@ -62,15 +63,17 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{id: string }> }) {
+  const { id } = await params;
+
   try {
     await connectDB()
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ success: false, error: "Invalid task ID" }, { status: 400 })
     }
 
-    const deletedTask = await Task.findByIdAndDelete(params.id).lean()
+    const deletedTask = await Task.findByIdAndDelete(id).lean()
 
     if (!deletedTask) {
       return NextResponse.json({ success: false, error: "Task not found" }, { status: 404 })

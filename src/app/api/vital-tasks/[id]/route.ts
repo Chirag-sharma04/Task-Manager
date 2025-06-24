@@ -3,15 +3,16 @@ import connectDB from "@/lib/mongodb"
 import VitalTask from "@/models/VitalTask"
 import mongoose from "mongoose"
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{id: string }> }) {
+  const { id } = await params;
   try {
     await connectDB()
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
-      return NextResponse.json({ success: false, error: "Invalid vital task ID" }, { status: 400 })
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ success: false, error: "Invalid task ID" }, { status: 400 })
     }
 
-    const vitalTask = await VitalTask.findById(params.id).lean()
+    const vitalTask = await VitalTask.findById(id).lean()
 
     if (!vitalTask) {
       return NextResponse.json({ success: false, error: "Vital task not found" }, { status: 404 })
@@ -27,18 +28,19 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{id: string }> }) {
+  const { id } = await params;
   try {
     await connectDB()
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
-      return NextResponse.json({ success: false, error: "Invalid vital task ID" }, { status: 400 })
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ success: false, error: "Invalid task ID" }, { status: 400 })
     }
 
-    const body = await request.json()
+    const body = await request.json();
 
     const updatedVitalTask = await VitalTask.findByIdAndUpdate(
-      params.id,
+      id,
       {
         ...body,
         updatedAt: new Date(),
@@ -61,15 +63,17 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{id: string }> }) {
+  const { id } = await params;
+
   try {
     await connectDB()
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
-      return NextResponse.json({ success: false, error: "Invalid vital task ID" }, { status: 400 })
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ success: false, error: "Invalid task ID" }, { status: 400 })
     }
 
-    const deletedVitalTask = await VitalTask.findByIdAndDelete(params.id).lean()
+    const deletedVitalTask = await VitalTask.findByIdAndDelete(id).lean()
 
     if (!deletedVitalTask) {
       return NextResponse.json({ success: false, error: "Vital task not found" }, { status: 404 })

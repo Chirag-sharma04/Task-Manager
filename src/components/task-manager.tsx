@@ -87,8 +87,10 @@ export default function TaskManager() {
       }
 
       const response = await get(`/api/tasks?${params.toString()}`)
-      if (response.success && response.data) {
-        setTasks(response.data)
+      if (response.success && Array.isArray(response.data)) {
+        setTasks(response.data as Task[])
+      } else {
+        setTasks([])
       }
     } catch (error) {
       console.error("Error fetching tasks:", error)
