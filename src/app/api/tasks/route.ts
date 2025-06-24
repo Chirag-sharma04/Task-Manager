@@ -14,8 +14,7 @@ export async function GET(request: NextRequest) {
     const page = Number.parseInt(searchParams.get("page") || "1")
     const limit = Number.parseInt(searchParams.get("limit") || "10")
 
-    // Build query object
-    const query: any = {}
+    const query: Record<string, unknown> = {}
 
     if (status) query.status = status
     if (priority) query.priority = priority

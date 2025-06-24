@@ -208,6 +208,26 @@ export default function VitalTaskModal({ isOpen, onClose, task, onSuccess }: Vit
             </div>
           </div>
 
+          {/* Status */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium dark:text-white">Status</Label>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-6">
+              {["Not Started", "In Progress", "Completed"].map((status) => (
+                <label key={status} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="status"
+                    value={status}
+                    checked={formData.status === status}
+                    onChange={(e) => handleInputChange("status", e.target.value)}
+                    className="w-4 h-4 text-coral-500 border-gray-300 focus:ring-coral-500 dark:border-gray-600 dark:bg-gray-700"
+                  />
+                  <span className="text-sm dark:text-white">{status}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Task Description */}
             <div className="space-y-2">

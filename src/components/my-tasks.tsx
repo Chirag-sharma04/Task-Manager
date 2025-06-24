@@ -117,7 +117,7 @@ export default function MyTasks() {
 
       // Add vital tasks
       if (vitalResult.success && vitalResult.data) {
-        const vitalTasks = vitalResult.data.map((task: any) => ({
+        const vitalTasks = vitalResult.data.map((task: Task) => ({
           ...task,
           type: "vital" as const,
         }))
@@ -126,7 +126,7 @@ export default function MyTasks() {
 
       // Add regular tasks
       if (regularResult.success && regularResult.data) {
-        const regularTasks = regularResult.data.map((task: any) => ({
+        const regularTasks = regularResult.data.map((task: Task) => ({
           ...task,
           type: "regular" as const,
         }))
@@ -135,7 +135,7 @@ export default function MyTasks() {
 
       // Add my tasks
       if (myTaskResult.success && myTaskResult.data) {
-        const myTasks = myTaskResult.data.map((task: any) => ({
+        const myTasks = myTaskResult.data.map((task: Task) => ({
           ...task,
           type: "my-task" as const,
         }))
@@ -492,7 +492,7 @@ export default function MyTasks() {
                 <CheckSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-400 mb-2">No Tasks Found</h3>
                 <p className="text-gray-500 dark:text-gray-500 mb-4">
-                  You haven't created any tasks yet. Start by adding your first task!
+                  You have not created any tasks yet. Start by adding your first task!
                 </p>
                 <div className="flex gap-2 justify-center">
                   <Button className="bg-coral-500 hover:bg-coral-600" onClick={() => router.push("/")}>

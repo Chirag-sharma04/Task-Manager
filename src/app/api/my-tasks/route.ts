@@ -11,8 +11,7 @@ export async function GET(request: NextRequest) {
     const priority = searchParams.get("priority")
     const search = searchParams.get("search")
 
-    // Build query object
-    const query: any = {}
+    const query: Record<string, unknown> = {}
 
     if (status) query.status = status
     if (priority) query.priority = priority

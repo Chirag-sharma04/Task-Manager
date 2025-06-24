@@ -26,6 +26,7 @@ import {
 } from "lucide-react"
 import VitalTaskModal from "./vital-task-modal"
 import { useApi } from "@/hooks/use-api"
+import Image from "next/image"
 
 interface VitalTask {
   _id: string
@@ -386,7 +387,7 @@ export default function VitalTasks() {
                               </div>
 
                               <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gray-100 dark:bg-gray-600 rounded-lg flex-shrink-0">
-                                <img
+                                <Image
                                   src={task.image || "/placeholder.svg?height=48&width=48"}
                                   alt={task.title}
                                   className="w-full h-full object-cover rounded-lg"
@@ -437,7 +438,7 @@ export default function VitalTasks() {
                       {selectedTask.image && (
                         <div className="mb-4 lg:mb-6">
                           <div className="w-full h-32 lg:h-48 bg-gray-100 dark:bg-gray-600 rounded-lg overflow-hidden">
-                            <img
+                            <Image
                               src={selectedTask.image || "/placeholder.svg"}
                               alt={selectedTask.title}
                               className="w-full h-full object-cover"

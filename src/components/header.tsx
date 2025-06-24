@@ -17,7 +17,7 @@ export function Header({ onMenuClick, isMobileMenuOpen }: HeaderProps) {
   const [showNotifications, setShowNotifications] = useState(false)
   const [showCalendar, setShowCalendar] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date>(new Date())
+  const [selectedCalendarDate] = useState<Date>(new Date())
 
   const formatDisplayDate = (date: Date) => {
     return date.toLocaleDateString("en-US", {

@@ -6,15 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
-interface Task {
-  _id: string
-  title: string
-  description: string
-  priority: "Low" | "Medium" | "High" | "Extremely High"
-  status: string
-  dueDate: string
-  createdAt: string
-}
 
 interface NotificationsWidgetProps {
   isOpen: boolean
@@ -22,7 +13,18 @@ interface NotificationsWidgetProps {
 }
 
 export default function NotificationsWidget({ isOpen, onClose }: NotificationsWidgetProps) {
-  const [notifications, setNotifications] = useState<any[]>([])
+  interface Notification {
+    id: string
+    title: string
+    description?: string
+    priority: string
+    timeText: string
+    type: string
+    status: string
+    category: string
+  }
+
+  const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

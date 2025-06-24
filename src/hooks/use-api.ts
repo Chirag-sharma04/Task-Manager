@@ -16,11 +16,11 @@ interface ApiResponse<T> {
 }
 
 interface UseApiOptions {
-  onSuccess?: (data: any) => void
+  onSuccess?: (data: unknown) => void
   onError?: (error: string) => void
 }
 
-export function useApi<T = any>(options: UseApiOptions = {}) {
+export function useApi<T = unknown>(options: UseApiOptions = {}) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -65,7 +65,7 @@ export function useApi<T = any>(options: UseApiOptions = {}) {
         setLoading(false)
       }
     },
-    [], // Remove options from dependencies to prevent infinite re-renders
+    [options], // Add options to dependencies to satisfy React Hook rules
   )
 
   const get = useCallback(
@@ -76,7 +76,7 @@ export function useApi<T = any>(options: UseApiOptions = {}) {
   )
 
   const post = useCallback(
-    (url: string, data: any) => {
+    (url: string, data: unknown) => {
       return request(url, {
         method: "POST",
         body: JSON.stringify(data),
@@ -86,7 +86,7 @@ export function useApi<T = any>(options: UseApiOptions = {}) {
   )
 
   const put = useCallback(
-    (url: string, data: any) => {
+    (url: string, data: unknown) => {
       return request(url, {
         method: "PUT",
         body: JSON.stringify(data),

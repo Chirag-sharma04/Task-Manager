@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Calendar, Upload, X } from "lucide-react"
 import { useApi } from "@/hooks/use-api"
+import Image from "next/image"
 
 interface Task {
   _id?: string
@@ -40,7 +41,6 @@ export default function TaskModal({ isOpen, onClose, task, onSuccess }: TaskModa
     image: "",
   })
 
-  const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string>("")
 
   const { loading, post, put } = useApi({
@@ -89,7 +89,6 @@ export default function TaskModal({ isOpen, onClose, task, onSuccess }: TaskModa
       dueDate: "",
       image: "",
     })
-    setImageFile(null)
     setImagePreview("")
     onClose()
   }
@@ -104,7 +103,6 @@ export default function TaskModal({ isOpen, onClose, task, onSuccess }: TaskModa
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      setImageFile(file)
       const reader = new FileReader()
       reader.onload = (e) => {
         const result = e.target?.result as string
@@ -126,7 +124,6 @@ export default function TaskModal({ isOpen, onClose, task, onSuccess }: TaskModa
     e.preventDefault()
     const file = e.dataTransfer.files[0]
     if (file && file.type.startsWith("image/")) {
-      setImageFile(file)
       const reader = new FileReader()
       reader.onload = (e) => {
         const result = e.target?.result as string
@@ -229,6 +226,48 @@ export default function TaskModal({ isOpen, onClose, task, onSuccess }: TaskModa
             </div>
           </div>
 
+          {/* Status */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium dark:text-white">Status</Label>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-6">
+              {["Not Started", "In Progress", "Completed"].map((status) => (
+                <label key={status} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="status"
+                    value={status}
+                    checked={formData.status === status}
+                    onChange={(e) => handleInputChange("status", e.target.value)}
+                    className="w-4 h-4 text-coral-500 border-gray-300 focus:ring-coral-500 dark:border-gray-600 dark:bg-gray-700"
+                  />
+                  <span className="text-sm dark:text-white">{status}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Category */}
+          <div className="space-y-2">
+            <Label htmlFor="category" className="text-sm font-medium dark:text-white">
+              Category
+            </Label>
+            <select
+              id="category"
+              value={formData.category}
+              onChange={(e) => handleInputChange("category", e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-coral-500 focus:border-coral-500 dark:bg-gray-700 dark:text-white text-sm"
+            >
+              <option value="Personal">Personal</option>
+              <option value="Work">Work</option>
+              <option value="Health">Health</option>
+              <option value="Education">Education</option>
+              <option value="Finance">Finance</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Travel">Travel</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
             {/* Task Description */}
             <div className="space-y-2">
@@ -256,7 +295,7 @@ export default function TaskModal({ isOpen, onClose, task, onSuccess }: TaskModa
               >
                 {imagePreview ? (
                   <div className="relative">
-                    <img
+                    <Image
                       src={imagePreview || "/placeholder.svg"}
                       alt="Preview"
                       className="w-full h-24 lg:h-32 object-cover rounded-lg mb-2"
@@ -267,7 +306,6 @@ export default function TaskModal({ isOpen, onClose, task, onSuccess }: TaskModa
                       size="sm"
                       onClick={() => {
                         setImagePreview("")
-                        setImageFile(null)
                         setFormData((prev) => ({ ...prev, image: "" }))
                       }}
                       className="absolute top-1 right-1 bg-black/50 hover:bg-black/70 text-white"
