@@ -102,7 +102,7 @@ export default function TaskManager() {
   // Load tasks on component mount and when search query changes
   useEffect(() => {
     fetchTasks()
-  }, [fetchTasks])
+  }, [])
 
   const handleNavigation = (route: string) => {
     router.push(route)
