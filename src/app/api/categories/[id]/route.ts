@@ -25,9 +25,9 @@ let taskPriorities: TaskPriority[] = [
   { id: 3, name: "Low", createdAt: "2023-08-20T00:00:00Z" },
 ]
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, context: { params: { id: string } }) {
   try {
-    const id = Number.parseInt(params.id)
+    const id = Number.parseInt(context.params.id);
     const body = await request.json()
     const { type, name } = body
 
@@ -71,9 +71,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, context: { params: { id: string } }) {
   try {
-    const id = Number.parseInt(params.id)
+    const id = Number.parseInt(context.params.id);
     const { searchParams } = new URL(request.url)
     const type = searchParams.get("type")
 
