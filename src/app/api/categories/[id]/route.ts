@@ -25,9 +25,9 @@ let taskPriorities: TaskPriority[] = [
   { id: 3, name: "Low", createdAt: "2023-08-20T00:00:00Z" },
 ]
 
-export async function PUT(request: NextRequest, context: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const id = Number.parseInt(context.params.id);
+    const id = Number.parseInt(params.id)
     const body = await request.json()
     const { type, name } = body
 
@@ -66,14 +66,15 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
     } else {
       return NextResponse.json({ success: false, error: "Invalid type specified" }, { status: 400 })
     }
-  } catch {
+  } catch (error) {
+    console.error("Error updating category:", error)
     return NextResponse.json({ success: false, error: "Failed to update category" }, { status: 500 })
   }
 }
 
-export async function DELETE(request: NextRequest, context: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const id = Number.parseInt(context.params.id);
+    const id = Number.parseInt(params.id)
     const { searchParams } = new URL(request.url)
     const type = searchParams.get("type")
 
@@ -108,7 +109,8 @@ export async function DELETE(request: NextRequest, context: { params: { id: stri
     } else {
       return NextResponse.json({ success: false, error: "Invalid type specified" }, { status: 400 })
     }
-  } catch{
+  } catch (error) {
+    console.error("Error deleting category:", error)
     return NextResponse.json({ success: false, error: "Failed to delete category" }, { status: 500 })
   }
 }
