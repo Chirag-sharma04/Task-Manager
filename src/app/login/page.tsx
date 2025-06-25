@@ -113,7 +113,11 @@ export default function LoginPage() {
 
             {/* Remember Me */}
             <div className="flex items-center">
-              <Checkbox id="remember" checked={rememberMe} onCheckedChange={setRememberMe} />
+              <Checkbox
+                id="remember"
+                checked={rememberMe}
+                onCheckedChange={checked => setRememberMe(checked === true)}
+              />
               <label htmlFor="remember" className="ml-2 text-sm text-gray-600">
                 Remember Me
               </label>
@@ -182,7 +186,7 @@ export default function LoginPage() {
           {/* Register Link */}
           <div className="text-center">
             <p className="text-gray-600">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/register" className="text-blue-600 hover:text-blue-700 font-semibold">
                 Create One
               </Link>

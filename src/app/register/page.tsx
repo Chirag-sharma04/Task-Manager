@@ -215,7 +215,11 @@ export default function RegisterPage() {
 
             {/* Terms Agreement */}
             <div className="flex items-center">
-              <Checkbox id="terms" checked={agreeToTerms} onCheckedChange={setAgreeToTerms} />
+              <Checkbox
+                id="terms"
+                checked={agreeToTerms}
+                onCheckedChange={checked => setAgreeToTerms(checked === true)}
+              />
               <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
                 I agree to all terms
               </label>
