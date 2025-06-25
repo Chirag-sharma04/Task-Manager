@@ -10,6 +10,7 @@ export interface ITask extends Document {
   image?: string
   createdAt: Date
   updatedAt: Date
+  user: mongoose.Types.ObjectId 
 }
 
 const TaskSchema = new Schema<ITask>(
@@ -47,13 +48,18 @@ const TaskSchema = new Schema<ITask>(
     image: {
       type: String,
     },
+    user: {
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "User",
+      required: true,
+    },
   },
   {
     timestamps: true,
   },
 )
 
-// Create indexes for better query performance
+// Indexes for performance
 TaskSchema.index({ status: 1 })
 TaskSchema.index({ priority: 1 })
 TaskSchema.index({ category: 1 })

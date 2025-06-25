@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          <AuthProvider> {/* ✅ Wrap your entire app with this */}
+          <AuthProvider> 
             {children}
             <Toaster />
           </AuthProvider>

@@ -35,7 +35,7 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const success = await login(formData.username, formData.password)
+      const success = await login(formData.username.trim().toLowerCase(), formData.password)
       if (success) {
         router.push("/")
       } else {
