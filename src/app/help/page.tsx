@@ -13,14 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import {
-  MessageCircle,
-  Mail,
-  Phone,
-  ChevronRight,
-  ChevronDown,
-  ArrowLeft,
-} from "lucide-react";
+import { MessageCircle, Mail, Phone, ChevronRight, ChevronDown, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation";
 
 export default function HelpPage() {
@@ -51,29 +44,25 @@ export default function HelpPage() {
     },
     {
       question: "How do I export my data?",
-      answer:
-        'Go to Settings > Data Management and click "Export". You’ll receive a downloadable file.',
+      answer: 'Go to Settings > Data Management and click "Export". You\'ll receive a downloadable file.',
     },
     {
       question: "How to delete my account?",
-      answer:
-        "Head to Settings > Account > Delete Account. This action is irreversible.",
+      answer: "Head to Settings > Account > Delete Account. This action is irreversible.",
     },
     {
+    
       question: "How to enable dark mode?",
-      answer:
-        "Use the theme toggle in the top-right corner of the dashboard or under Preferences.",
+      answer: "Use the theme toggle in the top-right corner of the dashboard or under Preferences.",
     },
     {
       question: "What if I forgot my password?",
-      answer:
-        "Click 'Forgot Password' on the login screen. A reset link will be sent to your email.",
+      answer: "Click 'Forgot Password' on the login screen. A reset link will be sent to your email.",
     },
     {
       question: "How do I categorize tasks?",
-      answer:
-        "Create categories from the sidebar and assign them when adding/editing a task.",
-    },
+      answer: "Create categories from the sidebar and assign them when adding/editing a task.",
+    }
   ];
 
   const handleContactSubmit = async (e: React.FormEvent) => {

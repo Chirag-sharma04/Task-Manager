@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState , useContext} from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,9 +11,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { User, Lock, Bell, Shield, Download, Trash2, Eye, EyeOff, ArrowLeft, Camera } from "lucide-react"
 import { useRouter } from "next/navigation"
+import {AuthContext}  from "@/contexts/auth-context"
 
 export default function SettingsPage() {
   const router = useRouter()
+  const auth = useContext(AuthContext)
+  const user = auth?.user
   const [activeSection, setActiveSection] = useState("account")
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
@@ -22,11 +25,10 @@ export default function SettingsPage() {
 
   // Form states
   const [accountInfo, setAccountInfo] = useState({
-    firstName: "username",
-    lastName: "",
-    email: "user@gmail.com",
+    firstName: user?.firstName || user?.username || "User",
+    lastName: user?.lastName || "",
+    email: user?.email || "",
     contactNumber: "",
-    position: "",
   })
 
   const [passwordForm, setPasswordForm] = useState({
