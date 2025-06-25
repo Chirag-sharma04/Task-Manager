@@ -6,11 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { User, Lock, Bell, Palette, Shield, Download, Trash2, Eye, EyeOff, ArrowLeft, Camera } from "lucide-react"
+import { User, Lock, Bell, Shield, Download, Trash2, Eye, EyeOff, ArrowLeft, Camera } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export default function SettingsPage() {
@@ -23,9 +22,9 @@ export default function SettingsPage() {
 
   // Form states
   const [accountInfo, setAccountInfo] = useState({
-    firstName: "amanuel",
+    firstName: "username",
     lastName: "",
-    email: "amanuel@gmail.com",
+    email: "user@gmail.com",
     contactNumber: "",
     position: "",
   })
@@ -41,9 +40,6 @@ export default function SettingsPage() {
     pushNotifications: false,
     taskReminders: true,
     weeklyReports: true,
-    theme: "light",
-    language: "en",
-    timezone: "UTC",
   })
 
   const handleAccountUpdate = async () => {
@@ -71,7 +67,6 @@ export default function SettingsPage() {
     { id: "account", label: "Account Information", icon: User },
     { id: "password", label: "Change Password", icon: Lock },
     { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "appearance", label: "Appearance", icon: Palette },
     { id: "privacy", label: "Privacy & Security", icon: Shield },
     { id: "data", label: "Data Management", icon: Download },
   ]
@@ -99,7 +94,7 @@ export default function SettingsPage() {
           <div className="relative">
             <Avatar className="h-20 w-20">
               <AvatarImage src="/placeholder.svg?height=80&width=80" />
-              <AvatarFallback className="text-lg">AM</AvatarFallback>
+              <AvatarFallback className="text-lg">UN</AvatarFallback>
             </Avatar>
             <Button size="sm" className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0">
               <Camera className="h-4 w-4" />
@@ -151,14 +146,6 @@ export default function SettingsPage() {
               onChange={(e) => setAccountInfo({ ...accountInfo, contactNumber: e.target.value })}
             />
           </div>
-          <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="position">Position</Label>
-            <Input
-              id="position"
-              value={accountInfo.position}
-              onChange={(e) => setAccountInfo({ ...accountInfo, position: e.target.value })}
-            />
-          </div>
         </div>
 
         {/* Action Buttons */}
@@ -200,7 +187,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-4">
           <Avatar className="h-16 w-16">
             <AvatarImage src="/placeholder.svg?height=64&width=64" />
-            <AvatarFallback>AM</AvatarFallback>
+            <AvatarFallback>UN</AvatarFallback>
           </Avatar>
           <div>
             <h3 className="font-semibold">{accountInfo.firstName}</h3>
@@ -349,72 +336,6 @@ export default function SettingsPage() {
     </Card>
   )
 
-  const renderAppearance = () => (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Palette className="h-5 w-5" />
-          Appearance Settings
-        </CardTitle>
-        <CardDescription>Customize the look and feel of your workspace</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Theme</Label>
-            <Select
-              value={preferences.theme}
-              onValueChange={(value) => setPreferences({ ...preferences, theme: value })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-                <SelectItem value="system">System</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Language</Label>
-            <Select
-              value={preferences.language}
-              onValueChange={(value) => setPreferences({ ...preferences, language: value })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="es">Spanish</SelectItem>
-                <SelectItem value="fr">French</SelectItem>
-                <SelectItem value="de">German</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Timezone</Label>
-            <Select
-              value={preferences.timezone}
-              onValueChange={(value) => setPreferences({ ...preferences, timezone: value })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="UTC">UTC</SelectItem>
-                <SelectItem value="EST">Eastern Time</SelectItem>
-                <SelectItem value="PST">Pacific Time</SelectItem>
-                <SelectItem value="GMT">Greenwich Mean Time</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-
   const renderPrivacy = () => (
     <Card>
       <CardHeader>
@@ -502,8 +423,6 @@ export default function SettingsPage() {
         return renderPasswordChange()
       case "notifications":
         return renderNotifications()
-      case "appearance":
-        return renderAppearance()
       case "privacy":
         return renderPrivacy()
       case "data":
