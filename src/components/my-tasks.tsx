@@ -378,10 +378,10 @@ export default function MyTasks() {
         <div className="p-4 lg:p-6 text-center">
           <Avatar className="w-12 h-12 lg:w-16 lg:h-16 mx-auto mb-3">
             <AvatarImage src="/placeholder.svg" />
-            <AvatarFallback className="bg-coral-500 text-white">AM</AvatarFallback>
+            <AvatarFallback className="bg-coral-500 text-white">UN</AvatarFallback>
           </Avatar>
-          <h3 className="font-semibold text-base lg:text-lg">amanuel</h3>
-          <p className="text-gray-400 text-xs lg:text-sm">amanuel@gmail.com</p>
+          <h3 className="font-semibold text-base lg:text-lg">user name</h3>
+          <p className="text-gray-400 text-xs lg:text-sm">user@gmail.com</p>
         </div>
 
         {/* Navigation Menu */}

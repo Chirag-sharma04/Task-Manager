@@ -1,7 +1,30 @@
+"use client"
 import Head from "next/head"
 import TaskManager from "@/components/task-manager"
+import { useAuth } from "@/contexts/auth-context"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 export default function Home() {
+  const { user, loading } = useAuth()
+  const router = useRouter()
+    useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login")
+    }
+  }, [user, loading, router])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-coral-500"></div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
   return (
     <>
       <Head>

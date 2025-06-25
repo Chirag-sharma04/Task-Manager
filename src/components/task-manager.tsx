@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useAuth } from "@/contexts/auth-context"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -55,6 +56,7 @@ export default function TaskManager() {
   const router = useRouter()
   const [showNotification, setShowNotification] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const { user } = useAuth()
 
   // Create separate API instances to avoid dependency issues
   const { get } = useApi()
@@ -187,14 +189,19 @@ export default function TaskManager() {
         </div>
 
         {/* User Profile */}
-        <div className="p-4 lg:p-6 text-center">
-          <Avatar className="w-12 h-12 lg:w-16 lg:h-16 mx-auto mb-3">
-            <AvatarImage src="/placeholder.svg" />
-            <AvatarFallback className="bg-coral-500 text-white">UN</AvatarFallback>
-          </Avatar>
-          <h3 className="font-semibold text-base lg:text-lg">User Name</h3>
-          <p className="text-gray-400 text-xs lg:text-sm">user@gmail.com</p>
-        </div>
+        <div className="p-6 text-center">
+          <Avatar className="w-16 h-16 mx-auto mb-3">
+        <AvatarImage src={user?.avatar || "/placeholder.svg"} />
+          <AvatarFallback className="bg-coral-500 text-white">
+            {user?.firstName?.[0]}
+            {user?.lastName?.[0]}
+          </AvatarFallback>
+        </Avatar>
+        <h3 className="font-semibold text-lg">
+          {user?.firstName} {user?.lastName}
+        </h3>
+        <p className="text-gray-400 text-sm">{user?.email}</p>
+      </div>
 
         {/* Navigation Menu */}
         <nav className="flex-1 px-3 lg:px-4">
@@ -317,7 +324,7 @@ export default function TaskManager() {
           {/* Welcome Section */}
           <div className="mb-6 lg:mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 lg:mb-6 gap-4">
-              <h2 className="text-xl lg:text-2xl font-semibold dark:text-white">Welcome back, user 👋</h2>
+              <h2 className="text-2xl font-semibold dark:text-white">Welcome back, {user?.firstName} 👋</h2>
 
               <div className="flex items-center gap-2">
                 {teamMembers.slice(0, 3).map((avatar, index) => (
