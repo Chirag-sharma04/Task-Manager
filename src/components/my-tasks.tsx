@@ -466,8 +466,14 @@ export default function MyTasks() {
               <ThemeToggle />
 
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium dark:text-white">Tuesday</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">20/08/2023</p>
+                <p className="text-sm font-medium dark:text-white">{new Date().toLocaleDateString("en-US", { weekday: "long" })}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {new Date().toLocaleDateString("en-US", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })}
+                </p>
               </div>
             </div>
           </div>

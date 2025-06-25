@@ -26,7 +26,7 @@ import {
 } from "lucide-react"
 import VitalTaskModal from "./vital-task-modal"
 import { useApi } from "@/hooks/use-api"
-import Image from "next/image"
+
 
 interface VitalTask {
   _id: string
@@ -279,8 +279,14 @@ export default function VitalTasks() {
               <ThemeToggle />
 
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium dark:text-white">Tuesday</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">20/08/2023</p>
+                <p className="text-sm font-medium dark:text-white">{new Date().toLocaleDateString("en-US", { weekday: "long" })}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                {new Date().toLocaleDateString("en-US", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  })}
+                </p>
               </div>
             </div>
           </div>
@@ -387,7 +393,7 @@ export default function VitalTasks() {
                               </div>
 
                               <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gray-100 dark:bg-gray-600 rounded-lg flex-shrink-0">
-                                <Image
+                                <img
                                   src={task.image || "/placeholder.svg?height=48&width=48"}
                                   alt={task.title}
                                   className="w-full h-full object-cover rounded-lg"
@@ -438,7 +444,7 @@ export default function VitalTasks() {
                       {selectedTask.image && (
                         <div className="mb-4 lg:mb-6">
                           <div className="w-full h-32 lg:h-48 bg-gray-100 dark:bg-gray-600 rounded-lg overflow-hidden">
-                            <Image
+                            <img
                               src={selectedTask.image || "/placeholder.svg"}
                               alt={selectedTask.title}
                               className="w-full h-full object-cover"

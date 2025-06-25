@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Upload, X, Plus, Trash2 } from "lucide-react"
 import { useApi } from "@/hooks/use-api"
-import Image from "next/image"
+
 
 interface VitalTask {
   _id?: string
@@ -251,7 +251,7 @@ export default function VitalTaskModal({ isOpen, onClose, task, onSuccess }: Vit
               <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
                 {imagePreview ? (
                   <div className="relative">
-                    <Image
+                    <img
                       src={imagePreview || "/placeholder.svg"}
                       alt="Preview"
                       className="w-full h-32 object-cover rounded-lg mb-2"
