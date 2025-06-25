@@ -5,7 +5,6 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -56,6 +55,7 @@ export default function RegisterPage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", 
         body: JSON.stringify({
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -92,22 +92,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Left side - Illustration */}
-      <div className="hidden lg:block lg:w-1/2 bg-gradient-to-br from-blue-400 to-purple-600 relative">
-        <div className="absolute inset-0 flex items-center justify-center p-8">
-          <div className="relative w-full h-96 max-w-md">
-            <Image
-              src="/images/register-illustration.png"
-              alt="Register Illustration"
-              fill
-              className="object-contain"
-              priority
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Right side - Form */}
+      
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div>

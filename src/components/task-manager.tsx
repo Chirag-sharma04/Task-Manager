@@ -57,7 +57,7 @@ export default function TaskManager() {
   const [showNotification, setShowNotification] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const { user } = useAuth()
-
+  const { logout }= useAuth()
   // Create separate API instances to avoid dependency issues
   const { get } = useApi()
   const { delete: deleteTask } = useApi()
@@ -223,7 +223,7 @@ export default function TaskManager() {
 
         {/* Logout */}
         <div className="p-3 lg:p-4">
-          <button className="w-full flex items-center gap-3 px-3 lg:px-4 py-2 lg:py-3 text-gray-300 hover:bg-gray-800 dark:hover:bg-gray-800 rounded-lg text-sm lg:text-base">
+          <button onClick={logout} className="w-full flex items-center gap-3 px-3 lg:px-4 py-2 lg:py-3 text-gray-300 hover:bg-gray-800 dark:hover:bg-gray-800 rounded-lg text-sm lg:text-base">
             <LogOut className="w-4 h-4 lg:w-5 lg:h-5" />
             <span>Logout</span>
           </button>

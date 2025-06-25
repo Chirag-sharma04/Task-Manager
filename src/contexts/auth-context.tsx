@@ -76,17 +76,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      })
-    } catch (error) {
-      console.error("Logout failed:", error)
-    } finally {
+     const response = await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include", // ✅ Important to clear HTTP-only cookie
+    })
+
+    if (response.ok) {
       setUser(null)
-      router.push("/login")
+      router.push("/login") // ✅ Redirect after logout
+    } else {
+      console.error("Logout API error:", await response.json())
     }
-  }
+  } catch (error) {
+    console.error("Logout failed:", error)
+   }
+ }
 
   return <AuthContext.Provider value={{ user, login, logout, loading }}>{children}</AuthContext.Provider>
 }
