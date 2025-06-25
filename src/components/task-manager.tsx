@@ -288,7 +288,7 @@ export default function TaskManager() {
 
               {/* Date - Hidden on small screens */}
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium dark:text-white">Tuesday</p>
+                <p className="text-sm font-medium dark:text-white">{new Date().toLocaleDateString("en-US", { weekday: "long" })}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   {new Date().toLocaleDateString("en-US", {
                     day: "2-digit",
