@@ -79,7 +79,11 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
         {/* Logout */}
         <div className="p-4">
          <button
-           onClick={logout}
+           onClick={() => {
+             if (confirm("Are you sure you want to logout?")) {
+               logout()
+             }
+           }}
            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 text-left text-sm transition-colors text-gray-800 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-gray-800"
             >
             <LogOut className="w-5 h-5" />
