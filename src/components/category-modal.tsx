@@ -6,104 +6,239 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Textarea } from "@/components/ui/textarea"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { X } from "lucide-react"
+
+interface EditData {
+  _id: string
+  name: string
+  description?: string
+  color?: string
+  level?: number
+}
 
 interface CategoryModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: { name: string; type: "status" | "priority" }) => void
+  onSubmit: (data: {
+    name: string
+    description?: string
+    color?: string
+    level?: number
+    type: "status" | "priority"
+  }) => Promise<void>
   type: "status" | "priority"
-  editData?: { id: number; name: string } | null
-  isLoading?: boolean
+  editData: EditData | null
+  isLoading: boolean
 }
 
-export default function CategoryModal({
-  isOpen,
-  onClose,
-  onSubmit,
-  type,
-  editData,
-  isLoading = false,
-}: CategoryModalProps) {
-  const [name, setName] = useState("")
+const predefinedColors = [
+  { name: "Red", value: "#ef4444" },
+  { name: "Orange", value: "#f97316" },
+  { name: "Yellow", value: "#eab308" },
+  { name: "Green", value: "#22c55e" },
+  { name: "Blue", value: "#3b82f6" },
+  { name: "Purple", value: "#a855f7" },
+  { name: "Pink", value: "#ec4899" },
+  { name: "Gray", value: "#6b7280" },
+]
 
+export default function CategoryModal({ isOpen, onClose, onSubmit, type, editData, isLoading }: CategoryModalProps) {
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    color: "#6b7280",
+    level: 5,
+  })
+
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
+
+  // Reset form when modal opens/closes or editData changes
   useEffect(() => {
-    if (editData) {
-      setName(editData.name)
-    } else {
-      setName("")
+    if (isOpen) {
+      if (editData) {
+        // Editing existing item
+        setFormData({
+          name: editData.name || "",
+          description: editData.description || "",
+          color: editData.color || "#6b7280",
+          level: editData.level || 5,
+        })
+      } else {
+        // Creating new item
+        setFormData({
+          name: "",
+          description: "",
+          color: "#6b7280",
+          level: 5,
+        })
+      }
+      setErrors({})
     }
-  }, [editData, isOpen])
+  }, [isOpen, editData])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {}
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required"
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = "Name must be at least 2 characters"
+    } else if (formData.name.trim().length > 50) {
+      newErrors.name = "Name must be less than 50 characters"
+    }
+
+    if (formData.description && formData.description.length > 200) {
+      newErrors.description = "Description must be less than 200 characters"
+    }
+
+    if (type === "priority") {
+      if (formData.level < 1 || formData.level > 10) {
+        newErrors.level = "Priority level must be between 1 and 10"
+      }
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (name.trim()) {
-      onSubmit({ name: name.trim(), type })
-      setName("")
+
+    if (!validateForm()) {
+      return
+    }
+
+    try {
+      const submitData = {
+        name: formData.name.trim(),
+        description: formData.description.trim() || undefined,
+        color: formData.color,
+        type,
+        ...(type === "priority" && { level: formData.level }),
+      }
+
+      await onSubmit(submitData)
+    } catch (error) {
+      console.error("Error submitting form:", error)
     }
   }
 
   const handleClose = () => {
-    setName("")
+    setFormData({
+      name: "",
+      description: "",
+      color: "#6b7280",
+      level: 5,
+    })
+    setErrors({})
     onClose()
   }
 
-  if (!isOpen) return null
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md bg-white dark:bg-gray-800">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle className="text-lg font-semibold dark:text-white">
-            {editData ? `Edit ${type === "status" ? "Task Status" : "Task Priority"}` : "Create Categories"}
-          </CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="categoryName" className="text-sm font-medium dark:text-white">
-                Category Name
-              </Label>
-              <Input
-                id="categoryName"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder={`Enter ${type === "status" ? "status" : "priority"} name`}
-                className="w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                required
-              />
-            </div>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-md mx-4 sm:mx-0">
+        <DialogHeader>
+          <div className="flex items-center justify-between">
+            <DialogTitle>
+              {editData ? "Edit" : "Add"} {type === "status" ? "Status" : "Priority"}
+            </DialogTitle>
+            <Button variant="ghost" size="sm" onClick={handleClose}>
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </DialogHeader>
 
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="submit"
-                disabled={isLoading || !name.trim()}
-                className="flex-1 bg-coral-500 hover:bg-coral-600 text-white"
-              >
-                {isLoading ? "Processing..." : editData ? "Update" : "Create"}
-              </Button>
-              <Button
-                type="button"
-                onClick={handleClose}
-                variant="outline"
-                className="flex-1 border-coral-500 text-coral-500 hover:bg-coral-50 dark:hover:bg-coral-900/20"
-              >
-                Cancel
-              </Button>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Name Field */}
+          <div className="space-y-2">
+            <Label htmlFor="name">{type === "status" ? "Status" : "Priority"} Name *</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder={`Enter ${type} name`}
+              className={errors.name ? "border-red-500" : ""}
+            />
+            {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+          </div>
+
+          {/* Description Field */}
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder={`Enter ${type} description (optional)`}
+              rows={3}
+              className={errors.description ? "border-red-500" : ""}
+            />
+            {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
+          </div>
+
+          {/* Color Field */}
+          <div className="space-y-2">
+            <Label htmlFor="color">Color</Label>
+            <div className="flex gap-2 flex-wrap">
+              {predefinedColors.map((colorOption) => (
+                <button
+                  key={colorOption.value}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, color: colorOption.value })}
+                  className={`w-8 h-8 rounded-full border-2 ${
+                    formData.color === colorOption.value ? "border-gray-800 dark:border-white" : "border-gray-300"
+                  }`}
+                  style={{ backgroundColor: colorOption.value }}
+                  title={colorOption.name}
+                />
+              ))}
             </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+            <Input
+              id="color"
+              type="color"
+              value={formData.color}
+              onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+              className="w-20 h-10"
+            />
+          </div>
+
+          {/* Priority Level Field (only for priorities) */}
+          {type === "priority" && (
+            <div className="space-y-2">
+              <Label htmlFor="level">Priority Level *</Label>
+              <Select
+                value={formData.level.toString()}
+                onValueChange={(value) => setFormData({ ...formData, level: Number.parseInt(value) })}
+              >
+                <SelectTrigger className={errors.level ? "border-red-500" : ""}>
+                  <SelectValue placeholder="Select priority level" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 10 }, (_, i) => i + 1).map((level) => (
+                    <SelectItem key={level} value={level.toString()}>
+                      Level {level} {level <= 3 ? "(Low)" : level <= 6 ? "(Medium)" : "(High)"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.level && <p className="text-sm text-red-500">{errors.level}</p>}
+            </div>
+          )}
+
+          {/* Submit Buttons */}
+          <div className="flex gap-3 pt-4">
+            <Button type="submit" disabled={isLoading} className="bg-coral-500 hover:bg-coral-600 flex-1">
+              {isLoading ? "Saving..." : editData ? "Update" : "Create"}
+            </Button>
+            <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Calendar, Upload, X } from "lucide-react"
 import { useApi } from "@/hooks/use-api"
 import Image from "next/image"
-
+import { useAuth } from "@/contexts/auth-context"
 interface Task {
   _id?: string
   title: string
@@ -30,6 +30,7 @@ interface TaskModalProps {
   onSuccess?: () => void
 }
 
+
 export default function TaskModal({ isOpen, onClose, task, onSuccess }: TaskModalProps) {
   const [formData, setFormData] = useState<Partial<Task>>({
     title: "",
@@ -40,7 +41,7 @@ export default function TaskModal({ isOpen, onClose, task, onSuccess }: TaskModa
     dueDate: "",
     image: "",
   })
-
+  const {user}= useAuth()
   const [imagePreview, setImagePreview] = useState<string>("")
 
   const { loading, post, put } = useApi({
@@ -147,6 +148,7 @@ export default function TaskModal({ isOpen, onClose, task, onSuccess }: TaskModa
     const taskData = {
       ...formData,
       dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : undefined,
+      user: user?.id,
     }
 
     if (task?._id) {
@@ -355,3 +357,5 @@ export default function TaskModal({ isOpen, onClose, task, onSuccess }: TaskModa
     </Dialog>
   )
 }
+
+

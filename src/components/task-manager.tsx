@@ -4,34 +4,21 @@ import type React from "react"
 
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+
 import { useAuth } from "@/contexts/auth-context"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ThemeToggle } from "@/components/theme-toggle"
 import TaskModal from "@/components/task-modal"
-import NotificationsWidget from "@/components/notifications-widget";
-import { CalendarWidget } from "@/components/calendar-widget"
+import Sidebar from "@/components/Sidebar"
+import Navbar from "@/components/Navbar"
 import { useApi } from "@/hooks/use-api"
 import {
-  Search,
-  Bell,
-  Calendar,
   Plus,
-  LayoutDashboard,
-  Zap,
   CheckSquare,
-  Grid3X3,
-  Settings,
-  HelpCircle,
-  LogOut,
   Users,
   Edit,
   Trash2,
-  Menu,
-  X,
 } from "lucide-react"
-import { useRouter } from "next/navigation"
 import Image from "next/image"
 
 interface Task {
@@ -53,23 +40,10 @@ export default function TaskManager() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const router = useRouter()
-  const [showNotification, setShowNotification] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false);
   const { user } = useAuth()
-  const { logout }= useAuth()
   // Create separate API instances to avoid dependency issues
   const { get } = useApi()
   const { delete: deleteTask } = useApi()
-
-  const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", active: true, route: "/" },
-    { icon: Zap, label: "Vital Task", active: false, route: "/vital" },
-    { icon: CheckSquare, label: "My Task", active: false, route: "/tasks" },
-    { icon: Grid3X3, label: "Task Categories", active: false, route: "/categories" },
-    { icon: Settings, label: "Settings", active: false, route: "/settings" },
-    { icon: HelpCircle, label: "Help", active: false, route: "/help" },
-  ]
 
   const teamMembers = [
     "/placeholder.svg",
@@ -105,11 +79,6 @@ export default function TaskManager() {
   useEffect(() => {
     fetchTasks()
   }, [])
-
-  const handleNavigation = (route: string) => {
-    router.push(route)
-    setIsSidebarOpen(false) // Close sidebar on mobile after navigation
-  }
 
   const handleAddTask = () => {
     setEditingTask(null)
@@ -164,160 +133,18 @@ export default function TaskManager() {
   const completedTasks = tasks.filter((task) => task.status === "Completed")
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 relative">
-      {/* Mobile Sidebar Overlay */}
-      {isSidebarOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
-      )}
-
+     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 relative">
       {/* Sidebar */}
-      <div
-        className={`${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 w-64 bg-black dark:bg-gray-950 text-white flex flex-col transition-transform duration-300 ease-in-out`}
-      >
-        {/* Mobile Close Button */}
-        <div className="lg:hidden flex justify-end p-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsSidebarOpen(false)}
-            className="text-white hover:bg-gray-800"
-          >
-            <X className="w-5 h-5" />
-          </Button>
-        </div>
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-        {/* User Profile */}
-        <div className="p-6 text-center">
-          <Avatar className="w-16 h-16 mx-auto mb-3">
-        <AvatarImage src={user?.avatar || "/placeholder.svg"} />
-          <AvatarFallback className="bg-coral-500 text-white">
-            {user?.firstName?.[0]}
-            {user?.lastName?.[0]}
-          </AvatarFallback>
-        </Avatar>
-        <h3 className="font-semibold text-lg">
-          {user?.firstName} {user?.lastName}
-        </h3>
-        <p className="text-gray-400 text-sm">{user?.email}</p>
-      </div>
-
-        {/* Navigation Menu */}
-        <nav className="flex-1 px-3 lg:px-4">
-          {menuItems.map((item) => (
-            <button
-              key={item.label}
-              onClick={() => handleNavigation(item.route)}
-              className={`w-full flex items-center gap-3 px-3 lg:px-4 py-2 lg:py-3 rounded-lg mb-2 text-left transition-colors text-sm lg:text-base ${
-                item.label === "Dashboard"
-                  ? "bg-coral-500 text-white"
-                  : "text-gray-300 hover:bg-gray-800 dark:hover:bg-gray-800"
-              }`}
-            >
-              <item.icon className="w-4 h-4 lg:w-5 lg:h-5" />
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </nav>
-
-        {/* Logout */}
-        <div className="p-3 lg:p-4">
-          <button onClick={logout} className="w-full flex items-center gap-3 px-3 lg:px-4 py-2 lg:py-3 text-gray-300 hover:bg-gray-800 dark:hover:bg-gray-800 rounded-lg text-sm lg:text-base">
-            <LogOut className="w-4 h-4 lg:w-5 lg:h-5" />
-            <span>Logout</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Main Content */}
+      {/* Navigation*/}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Header */}
-        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 lg:px-6 py-3 lg:py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 lg:gap-6 min-w-0 flex-1">
-              {/* Mobile Menu Button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsSidebarOpen(true)}
-                className="lg:hidden text-gray-600 dark:text-gray-300"
-              >
-                <Menu className="w-5 h-5" />
-              </Button>
-
-              <h1 className="text-xl lg:text-2xl font-bold">
-                <span className="text-coral-500">Dash</span>
-                <span className="text-black dark:text-white">board</span>
-              </h1>
-
-              {/* Search - Hidden on small screens, shown on medium+ */}
-              <form onSubmit={handleSearch} className="relative hidden md:block">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  placeholder="Search your task here..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 w-60 lg:w-80 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-                />
-              </form>
-            </div>
-
-            <div className="flex items-center gap-2 lg:gap-4">
-              {/* Search Button - Visible on all screens */}
-              <Button size="sm" className="bg-coral-500 hover:bg-coral-600">
-                <Search className="w-4 h-4" />
-              </Button>
-
-              {/* Notification and Calendar - Hidden on small screens */}
-              <Button
-                size="sm"
-                variant="outline"
-                className="hidden sm:flex border-coral-500 text-coral-500 hover:bg-coral-50 dark:hover:bg-coral-900/20"
-                onClick={() => setShowNotification(!showNotification)}
-              >
-
-                <Bell className="w-4 h-4" />
-              <NotificationsWidget isOpen={showNotification} onClose={() => setShowNotification(false)} />
-              </Button>
-              
-              <Button
-                size="sm"
-                variant="outline"
-                className="hidden sm:flex border-coral-500 text-coral-500 hover:bg-coral-50 dark:hover:bg-coral-900/20"
-                onClick={() => setShowCalendar(!showCalendar)}
-              >
-                <Calendar className="w-4 h-4" />
-              <CalendarWidget isOpen={showCalendar} onClose={() => setShowCalendar(false)} />
-              </Button>
-
-              <ThemeToggle />
-
-              {/* Date - Hidden on small screens */}
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium dark:text-white">{new Date().toLocaleDateString("en-US", { weekday: "long" })}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {new Date().toLocaleDateString("en-US", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  })}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile Search Bar */}
-          <form onSubmit={handleSearch} className="relative mt-3 md:hidden">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              placeholder="Search your task here..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 w-full bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-            />
-          </form>
-        </header>
+         <Navbar
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          onSidebarToggle={() => setIsSidebarOpen(true)}
+          onSearch={handleSearch}
+        />
 
         {/* Main Dashboard Content */}
         <main className="flex-1 p-3 lg:p-6 overflow-auto">

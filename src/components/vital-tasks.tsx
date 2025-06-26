@@ -2,26 +2,13 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { useRouter } from "next/navigation"
+import Sidebar from "@/components/Sidebar"
+import Navbar from "@/components/Navbar"
 import {
-  Search,
-  Bell,
-  Calendar,
-  LayoutDashboard,
   Zap,
-  CheckSquare,
-  Grid3X3,
-  Settings,
-  HelpCircle,
-  LogOut,
   Edit,
   Trash2,
-  Menu,
-  X,
   Plus,
 } from "lucide-react"
 import VitalTaskModal from "./vital-task-modal"
@@ -48,7 +35,6 @@ export default function VitalTasks() {
   const [editingTask, setEditingTask] = useState<VitalTask | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
 
   const { loading: deleteLoading, delete: deleteTask } = useApi({
     onSuccess: () => {
@@ -61,15 +47,6 @@ export default function VitalTasks() {
       console.error("Error deleting vital task:", error)
     },
   })
-
-  const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", active: false, route: "/" },
-    { icon: Zap, label: "Vital Task", active: true, route: "/vital" },
-    { icon: CheckSquare, label: "My Task", active: false, route: "/tasks" },
-    { icon: Grid3X3, label: "Task Categories", active: false, route: "/categories" },
-    { icon: Settings, label: "Settings", active: false, route: "/settings" },
-    { icon: HelpCircle, label: "Help", active: false, route: "/help" },
-  ]
 
   const fetchVitalTasks = useCallback(async () => {
     try {
@@ -98,11 +75,6 @@ export default function VitalTasks() {
   useEffect(() => {
     fetchVitalTasks()
   }, [fetchVitalTasks])
-
-  const handleNavigation = (route: string) => {
-    router.push(route)
-    setIsSidebarOpen(false)
-  }
 
   const handleAddTask = () => {
     setEditingTask(null)
@@ -147,162 +119,40 @@ export default function VitalTasks() {
     }
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    })
-  }
-
   const filteredTasks = vitalTasks.filter(
     (task) =>
       task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       task.description.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
+  // Helper to format date strings
+  function formatDate(dateString: string): string {
+    const date = new Date(dateString)
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
+
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 relative">
-      {/* Mobile Sidebar Overlay */}
-      {isSidebarOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
-      )}
+    {/* Sidebar */}
+    <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} /> 
 
-      {/* Sidebar */}
-      <div
-        className={`${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50 w-64 bg-black dark:bg-gray-950 text-white flex flex-col transition-transform duration-300 ease-in-out`}
-      >
-        {/* Mobile Close Button */}
-        <div className="lg:hidden flex justify-end p-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsSidebarOpen(false)}
-            className="text-white hover:bg-gray-800"
-          >
-            <X className="w-5 h-5" />
-          </Button>
-        </div>
-
-        {/* User Profile */}
-        <div className="p-4 lg:p-6 text-center">
-          <Avatar className="w-12 h-12 lg:w-16 lg:h-16 mx-auto mb-3">
-            <AvatarImage src="/placeholder.svg" />
-            <AvatarFallback className="bg-coral-500 text-white">UN</AvatarFallback>
-          </Avatar>
-          <h3 className="font-semibold text-base lg:text-lg">user name</h3>
-          <p className="text-gray-400 text-xs lg:text-sm">user@gmail.com</p>
-        </div>
-
-        {/* Navigation Menu */}
-        <nav className="flex-1 px-3 lg:px-4">
-          {menuItems.map((item) => (
-            <button
-              key={item.label}
-              onClick={() => handleNavigation(item.route)}
-              className={`w-full flex items-center gap-3 px-3 lg:px-4 py-2 lg:py-3 rounded-lg mb-2 text-left transition-colors text-sm lg:text-base ${
-                item.active ? "bg-coral-500 text-white" : "text-gray-300 hover:bg-gray-800 dark:hover:bg-gray-800"
-              }`}
-            >
-              <item.icon className="w-4 h-4 lg:w-5 lg:h-5" />
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </nav>
-
-        {/* Logout */}
-        <div className="p-3 lg:p-4">
-          <button className="w-full flex items-center gap-3 px-3 lg:px-4 py-2 lg:py-3 text-gray-300 hover:bg-gray-800 dark:hover:bg-gray-800 rounded-lg text-sm lg:text-base">
-            <LogOut className="w-4 h-4 lg:w-5 lg:h-5" />
-            <span>Logout</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Main Content */}
+    {/* Navigation*/}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Header */}
-        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 lg:px-6 py-3 lg:py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 lg:gap-6 min-w-0 flex-1">
-              {/* Mobile Menu Button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsSidebarOpen(true)}
-                className="lg:hidden text-gray-600 dark:text-gray-300"
-              >
-                <Menu className="w-5 h-5" />
-              </Button>
-
-              <h1 className="text-xl lg:text-2xl font-bold">
-                <span className="text-coral-500">To-</span>
-                <span className="text-black dark:text-white">Do</span>
-              </h1>
-
-              {/* Search - Hidden on small screens */}
-              <div className="relative hidden md:block">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  placeholder="Search vital tasks..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-60 lg:w-80 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 lg:gap-4">
-              <Button size="sm" className="bg-coral-500 hover:bg-coral-600" onClick={handleAddTask}>
-                <Plus className="w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">Add Task</span>
-              </Button>
-
-              <Button
-                size="sm"
-                variant="outline"
-                className="hidden sm:flex border-coral-500 text-coral-500 hover:bg-coral-50 dark:hover:bg-coral-900/20"
-              >
-                <Bell className="w-4 h-4" />
-              </Button>
-
-              <Button
-                size="sm"
-                variant="outline"
-                className="hidden sm:flex border-coral-500 text-coral-500 hover:bg-coral-50 dark:hover:bg-coral-900/20"
-              >
-                <Calendar className="w-4 h-4" />
-              </Button>
-
-              <ThemeToggle />
-
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium dark:text-white">{new Date().toLocaleDateString("en-US", { weekday: "long" })}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                {new Date().toLocaleDateString("en-US", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                  })}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile Search Bar */}
-          <div className="relative mt-3 md:hidden">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              placeholder="Search vital tasks..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-full bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-            />
-          </div>
-        </header>
-
+   <Navbar
+    searchQuery={searchTerm}
+    setSearchQuery={setSearchTerm}
+    onSidebarToggle={() => setIsSidebarOpen(true)}
+    onSearch={(e) => {
+      e.preventDefault()
+      fetchVitalTasks()
+    }}
+  />
         {/* Main Content */}
         <main className="flex-1 p-3 lg:p-6 overflow-auto">
           {isLoading ? (

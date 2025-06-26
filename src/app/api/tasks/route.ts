@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import connectDB from "@/lib/mongodb"
 import Task from "@/models/Task"
+import jwt from "jsonwebtoken"
+import { cookies } from "next/headers"
 
 export async function GET(request: NextRequest) {
   try {
@@ -51,6 +53,13 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     await connectDB()
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback-secret") as { userId: string }
 
     const body = await request.json()
 
@@ -67,6 +76,7 @@ export async function POST(request: NextRequest) {
       status: body.status || "Not Started",
       dueDate: body.dueDate ? new Date(body.dueDate) : undefined,
       image: body.image,
+      user: decoded.userId, 
     })
 
     const savedTask = await newTask.save()
