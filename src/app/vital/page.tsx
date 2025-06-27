@@ -10,10 +10,10 @@ export default function VitalPage() {
         <meta name="keywords" content="vital tasks, urgent tasks, high priority, task manager" />
 
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://yourdomain.com/vital" />
+        <meta property="og:url" content="https://task-manager-smoky-five.vercel.app/vital" />
         <meta property="og:title" content="Vital Tasks - Personal Task Manager" />
         <meta property="og:description" content="Focus on your most critical tasks." />
-        <meta property="og:image" content="https://yourdomain.com/og-image.png" />
+        <meta property="og:image" content="https://task-manager-smoky-five.vercel.app/og-image.jpg" />
       </Head>
 
       <main className="min-h-screen bg-gray-50">

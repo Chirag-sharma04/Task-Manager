@@ -34,16 +34,16 @@ export default function Home() {
 
         {/* Open Graph Tags */}
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://yourdomain.com/" />
+        <meta property="og:url" content="https://task-manager-smoky-five.vercel.app/" />
         <meta property="og:title" content="Personal Task Manager" />
         <meta property="og:description" content="Create and manage personal tasks effortlessly." />
-        <meta property="og:image" content="https://yourdomain.com/og-image.png" />
+        <meta property="og:image" content="https://task-manager-smoky-five.vercel.app/og-image.jpg" />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Personal Task Manager" />
         <meta name="twitter:description" content="Organize your tasks efficiently with this simple tool." />
-        <meta name="twitter:image" content="https://yourdomain.com/og-image.png" />
+        <meta name="twitter:image" content="https://task-manager-smoky-five.vercel.app/og-image.jpg" />
       </Head>
 
       <main className="min-h-screen bg-gray-50">
