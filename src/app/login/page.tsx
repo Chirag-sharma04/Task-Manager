@@ -145,10 +145,17 @@ export default function LoginPage() {
             </div>
 
             <div className="mt-4 flex justify-center space-x-4">
-              {/* Facebook */}
-              <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                <Facebook className="w-5 h-5 text-blue-600" />
-              </button>
+            {/* Facebook */}
+           <button
+            onClick={() => {
+            window.location.href = "/api/auth/facebook"
+            }}
+            disabled={loading}
+            className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+           <Facebook className="w-5 h-5 text-blue-600" />
+           </button>
+
 
               {/* Google */}
               <button
