@@ -116,7 +116,7 @@ export default function InviteModal({ isOpen, onClose, onSuccess }: InviteModalP
             <Label htmlFor="message">Personal Message (Optional)</Label>
             <Textarea
               id="message"
-              placeholder={`Hi! ${user?.name || "I"} would like to invite you to collaborate on our task management workspace. Join us to stay organized and productive together!`}
+              placeholder={`Hi! ${user?.firstName || "I"} would like to invite you to collaborate on our task management workspace. Join us to stay organized and productive together!`}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={3}

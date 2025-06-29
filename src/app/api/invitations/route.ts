@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
       userId = decoded.userId
-    } catch (error) {
+    } catch  {
       return NextResponse.json({ success: false, error: "Invalid token" }, { status: 401 })
     }
 
@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
       userId = decoded.userId
-    } catch (error) {
+    } catch {
       return NextResponse.json({ success: false, error: "Invalid token" }, { status: 401 })
     }
 
@@ -129,7 +129,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status")
 
     // Build query
-    const query: any = { invitedBy: userId }
+    const query: Record<string, unknown> = { invitedBy: userId }
     if (status) {
       query.status = status
     }

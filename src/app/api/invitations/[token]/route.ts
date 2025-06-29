@@ -4,11 +4,11 @@ import Invitation from "@/models/Invitation"
 import User from "@/models/User"
 import bcrypt from "bcryptjs"
 
-export async function GET(request: NextRequest, { params }: { params: { token: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{token: string }> }) {
   try {
     await connectDB()
 
-    const { token } = params
+    const { token } = await params
 
     // Find invitation by token
     const invitation = await Invitation.findOne({
@@ -36,11 +36,11 @@ export async function GET(request: NextRequest, { params }: { params: { token: s
   }
 }
 
-export async function POST(request: NextRequest, { params }: { params: { token: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise <{ token: string }> }) {
   try {
     await connectDB()
 
-    const { token } = params
+    const { token } = await params
     const body = await request.json()
     const { name, password } = body
 

@@ -166,7 +166,7 @@ export default function AcceptInvitePage() {
           </div>
           <CardTitle>Join the Team</CardTitle>
           <CardDescription>
-            You've been invited by <strong>{invitation?.invitedBy.name}</strong> to join the task management workspace.
+            You&apos;ve been invited by <strong>{invitation?.invitedBy.name}</strong> to join the task management workspace.
           </CardDescription>
         </CardHeader>
 
