@@ -88,7 +88,12 @@ export function Header({ onMenuClick, isMobileMenuOpen }: HeaderProps) {
 
       {/* Widgets */}
       <NotificationsWidget isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
-      <CalendarWidget isOpen={showCalendar} onClose={handleCalendarClose} />
+      <CalendarWidget
+        isOpen={showCalendar}
+        onClose={handleCalendarClose}
+        onDateSelect={() => {}}
+        selectedDate={selectedCalendarDate}
+      />
     </>
   )
 }
