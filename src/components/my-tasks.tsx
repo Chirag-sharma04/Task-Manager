@@ -9,8 +9,6 @@ import { useRouter } from "next/navigation"
 import {
   Zap,
   CheckSquare,
-  Edit,
-  Trash2,
   BarChart3,
   TrendingUp,
   Clock,
@@ -510,6 +508,13 @@ export default function MyTasks() {
                             >
                               <CardContent className="p-3 lg:p-4">
                                 <div className="flex gap-3 lg:gap-4">
+                                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gray-100 dark:bg-gray-600 rounded-lg flex-shrink-0">
+                                  <img
+                                    src={task.image || "/placeholder.svg?height=48&width=48"}
+                                    alt={task.title}
+                                    className="w-full h-full object-cover rounded-lg"
+                                  />
+                                  </div>
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-start gap-2 mb-2">
                                       <div
@@ -572,26 +577,19 @@ export default function MyTasks() {
                               {getTypeLabel(selectedTask.type)}
                             </span>
                           </div>
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 text-xs"
-                            >
-                              <Edit className="w-3 h-3 lg:w-4 lg:h-4 mr-1" />
-                              <span className="hidden sm:inline">Edit</span>
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="text-red-600 hover:text-red-700 dark:border-red-600 dark:text-red-400 text-xs"
-                            >
-                              <Trash2 className="w-3 h-3 lg:w-4 lg:h-4 mr-1" />
-                              <span className="hidden sm:inline">Delete</span>
-                            </Button>
-                          </div>
                         </div>
 
+                      {selectedTask.image && (
+                       <div className="mb-4 lg:mb-6">
+                        <div className="w-full h-32 lg:h-48 bg-gray-100 dark:bg-gray-600 rounded-lg overflow-hidden">
+                         <img
+                           src={selectedTask.image || "/placeholder.svg"}
+                           alt={selectedTask.title}
+                           className="w-full h-full object-cover"
+                           />
+                         </div>
+                        </div>
+                        )}
                         {/* Task Info */}
                         <div className="space-y-3 lg:space-y-4">
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs lg:text-sm">
