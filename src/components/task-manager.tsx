@@ -9,16 +9,11 @@ import { useAuth } from "@/contexts/auth-context"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import TaskModal from "@/components/task-modal"
+import InviteModal from "@/components/invite-modal"
 import Sidebar from "@/components/Sidebar"
 import Navbar from "@/components/Navbar"
 import { useApi } from "@/hooks/use-api"
-import {
-  Plus,
-  CheckSquare,
-  Users,
-  Edit,
-  Trash2,
-} from "lucide-react"
+import { Plus, CheckSquare, Users, Edit, Trash2 } from "lucide-react"
 import Image from "next/image"
 
 interface Task {
@@ -36,6 +31,7 @@ interface Task {
 export default function TaskManager() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false)
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -109,6 +105,11 @@ export default function TaskManager() {
     fetchTasks()
   }
 
+  const handleInviteSuccess = () => {
+    // You could refresh team members here if needed
+    console.log("Invitation sent successfully!")
+  }
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     // fetchTasks will be called automatically due to useEffect dependency on searchQuery
@@ -133,13 +134,13 @@ export default function TaskManager() {
   const completedTasks = tasks.filter((task) => task.status === "Completed")
 
   return (
-     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 relative">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 relative">
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       {/* Navigation*/}
       <div className="flex-1 flex flex-col min-w-0">
-         <Navbar
+        <Navbar
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           onSidebarToggle={() => setIsSidebarOpen(true)}
@@ -164,10 +165,11 @@ export default function TaskManager() {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="ml-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 text-xs lg:text-sm"
+                  onClick={() => setIsInviteModalOpen(true)}
+                  className="ml-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 text-xs lg:text-sm border-coral-500 text-coral-500 hover:bg-coral-50 dark:hover:bg-coral-900/20"
                 >
                   <Users className="w-3 h-3 lg:w-4 lg:h-4 mr-1" />
-                  <span className="hidden sm:inline">invite</span>
+                  <span className="hidden sm:inline">Invite</span>
                   <span className="sm:hidden">+</span>
                 </Button>
               </div>
@@ -547,6 +549,13 @@ export default function TaskManager() {
         onClose={() => setIsTaskModalOpen(false)}
         task={editingTask}
         onSuccess={handleTaskModalSuccess}
+      />
+
+      {/* Invite Modal */}
+      <InviteModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        onSuccess={handleInviteSuccess}
       />
     </div>
   )
