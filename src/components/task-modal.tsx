@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Calendar, Upload, X } from "lucide-react"
+import { Upload, X } from "lucide-react"
 import { useApi } from "@/hooks/use-api"
 import Image from "next/image"
 import { useAuth } from "@/contexts/auth-context"
@@ -204,7 +204,6 @@ export default function TaskModal({ isOpen, onClose, task, onSuccess }: TaskModa
                 onChange={(e) => handleInputChange("dueDate", e.target.value)}
                 className="dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
               />
-              <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
             </div>
           </div>
 

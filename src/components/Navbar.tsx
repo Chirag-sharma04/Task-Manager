@@ -21,6 +21,7 @@ export default function Navbar({
 }) {
   const [showNotification, setShowNotification] = useState(false)
   const [showCalendar, setShowCalendar] = useState(false)
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
   return (
     <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 lg:px-6 lg:py-4">
@@ -67,17 +68,29 @@ export default function Navbar({
             onClick={() => setShowCalendar(!showCalendar)}
           >
             <Calendar className="w-4 h-4" />
-            <CalendarWidget isOpen={showCalendar} onClose={() => setShowCalendar(false)} />
           </Button>
+            <CalendarWidget 
+              isOpen={showCalendar} 
+              onClose={() => setShowCalendar(false)} 
+              selectedDate={selectedDate ?? new Date()}
+              onDateSelect={(date) => {
+               setSelectedDate(date)
+               setShowCalendar(false)
+              }}
+            />
+
 
           <ThemeToggle />
 
           {/* Date */}
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-medium dark:text-white">{new Date().toLocaleDateString("en-US", { weekday: "long" })}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {new Date().toLocaleDateString("en-US", { day: "2-digit", month: "2-digit", year: "numeric" })}
+            <p className="text-sm font-medium dark:text-white">
+            {(selectedDate ?? new Date()).toLocaleDateString("en-US", { weekday: "long" })}
             </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+             {(selectedDate ?? new Date()).toLocaleDateString("en-US", { day: "2-digit", month: "2-digit", year: "numeric" })}
+            </p>
+
           </div>
         </div>
       </div>

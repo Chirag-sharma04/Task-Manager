@@ -8,11 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 interface CalendarWidgetProps {
   isOpen: boolean
   onClose: () => void
+  onDateSelect: (date: Date) => void
+  selectedDate: Date  
 }
 
-export function CalendarWidget({ isOpen, onClose }: CalendarWidgetProps) {
+export function CalendarWidget({ isOpen, onClose, selectedDate, onDateSelect }: CalendarWidgetProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
-  const [selectedDate, setSelectedDate] = useState(new Date())
 
   const monthNames = [
     "January",
@@ -66,14 +67,6 @@ export function CalendarWidget({ isOpen, onClose }: CalendarWidgetProps) {
     })
   }
 
-  const formatSelectedDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    })
-  }
-
   const isToday = (date: Date | null) => {
     if (!date) return false
     const today = new Date()
@@ -99,22 +92,8 @@ export function CalendarWidget({ isOpen, onClose }: CalendarWidgetProps) {
           </Button>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Date Display */}
-          <div className="flex items-center justify-center">
-            <div className="bg-gray-100 rounded-lg px-4 py-2 text-sm font-medium text-gray-700 relative">
-              {formatSelectedDate(selectedDate)}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
-                onClick={() => setSelectedDate(new Date())}
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            </div>
-          </div>
 
-          {/* Month Navigation */}
+        {/* Month Navigation */}
           <div className="flex items-center justify-between">
             <Button variant="ghost" size="sm" onClick={() => navigateMonth("prev")} className="h-8 w-8 p-0">
               <ChevronLeft className="h-4 w-4" />
@@ -141,7 +120,7 @@ export function CalendarWidget({ isOpen, onClose }: CalendarWidgetProps) {
             {days.map((day, index) => (
               <button
                 key={index}
-                onClick={() => day && setSelectedDate(day)}
+                onClick={() => day && onDateSelect(day)}
                 disabled={!day}
                 className={`
                   h-10 w-10 rounded-full text-sm font-medium transition-colors
