@@ -1,42 +1,83 @@
 import mongoose from "mongoose"
 
-const UserSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: true,
-  },
-  lastName: {
-    type: String,
-    required: true,
-  },
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: function (this: { googleId?: string }) {
-      return !this.googleId // Password required only if not Google user
+const userSchema = new mongoose.Schema(
+  {
+    firstName: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 50,
+    },
+    lastName: {
+      type: String,
+      trim: true,
+      maxlength: 50,
+      default: "",
+    },
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+      minlength: 3,
+      maxlength: 30,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+      select: false, // Don't include password in queries by default
+    },
+    avatar: {
+      type: String,
+      default: "",
+    },
+    contactNumber: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    googleId: {
+      type: String,
+      sparse: true, // Allow multiple null values
+    },
+    preferences: {
+      emailNotifications: {
+        type: Boolean,
+        default: true,
+      },
+      pushNotifications: {
+        type: Boolean,
+        default: false,
+      },
+      taskReminders: {
+        type: Boolean,
+        default: true,
+      },
+      weeklyReports: {
+        type: Boolean,
+        default: true,
+      },
     },
   },
-  avatar: {
-    type: String,
-    default: "",
+  {
+    timestamps: true,
   },
-  googleId: {
-    type: String,
-    sparse: true, // Allows multiple null values
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-})
+)
 
-export default mongoose.models.User || mongoose.model("User", UserSchema)
+// Create indexes
+userSchema.index({ email: 1 })
+userSchema.index({ username: 1 })
+userSchema.index({ googleId: 1 }, { sparse: true })
+
+const User = mongoose.models.User || mongoose.model("User", userSchema)
+
+export default User

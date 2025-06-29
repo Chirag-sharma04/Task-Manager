@@ -1,6 +1,8 @@
 "use client"
 
-import { useState , useContext} from "react"
+import type React from "react"
+
+import { useState, useContext, useRef} from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,26 +11,47 @@ import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { User, Lock, Bell, Shield, Download, Trash2, Eye, EyeOff, ArrowLeft, Camera } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import {
+  User,
+  Lock,
+  Bell,
+  Shield,
+  Download,
+  Trash2,
+  Eye,
+  EyeOff,
+  ArrowLeft,
+  Camera,
+  Upload,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react"
 import { useRouter } from "next/navigation"
-import {AuthContext}  from "@/contexts/auth-context"
+import { AuthContext } from "@/contexts/auth-context"
 
 export default function SettingsPage() {
   const router = useRouter()
   const auth = useContext(AuthContext)
   const user = auth?.user
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const [activeSection, setActiveSection] = useState("account")
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
+  const [successMessage, setSuccessMessage] = useState("")
+  const [errorMessage, setErrorMessage] = useState("")
 
-  // Form states
+  // Form states - initialize with user data
   const [accountInfo, setAccountInfo] = useState({
-    firstName: user?.firstName || user?.username || "User",
-    lastName: user?.lastName || "",
+    firstName: user?.firstName || user?.username || "",
+    lastName: user?.lastName ||"",
     email: user?.email || "",
     contactNumber: "",
+    avatar: "",
   })
 
   const [passwordForm, setPasswordForm] = useState({
@@ -44,25 +67,158 @@ export default function SettingsPage() {
     weeklyReports: true,
   })
 
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"]
+    if (!allowedTypes.includes(file.type)) {
+      setErrorMessage("Invalid file type. Only JPEG, PNG, and WebP are allowed.")
+      return
+    }
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    if (file.size > maxSize) {
+      setErrorMessage("File too large. Maximum size is 5MB.")
+      return
+    }
+
+    setIsUploadingAvatar(true)
+    setErrorMessage("")
+
+    try {
+      const formData = new FormData()
+      formData.append("avatar", file)
+
+      const response = await fetch("/api/settings/avatar", {
+        method: "POST",
+        body: formData,
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setAccountInfo((prev) => ({ ...prev, avatar: result.avatar }))
+        setSuccessMessage("Profile picture updated successfully!")
+
+        // Update auth context if available
+        if (auth?.user && result.user) {
+          // You might need to update the auth context here
+        }
+      } else {
+        setErrorMessage(result.error || "Failed to upload profile picture")
+      }
+    } catch (error) {
+      console.error("Avatar upload error:", error)
+      setErrorMessage("Failed to upload profile picture")
+    } finally {
+      setIsUploadingAvatar(false)
+    }
+  }
+
   const handleAccountUpdate = async () => {
     setIsLoading(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsLoading(false)
-    // Show success message
+    setErrorMessage("")
+    setSuccessMessage("")
+
+    try {
+      const response = await fetch("/api/settings/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(accountInfo),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setSuccessMessage("Profile updated successfully!")
+
+        // Update auth context if available
+        if (auth?.user && result.user) {
+          // You might need to update the auth context here
+        }
+      } else {
+        setErrorMessage(result.error || "Failed to update profile")
+      }
+    } catch (error) {
+      console.error("Profile update error:", error)
+      setErrorMessage("Failed to update profile")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handlePasswordUpdate = async () => {
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert("Passwords do not match")
+      setErrorMessage("New passwords do not match")
       return
     }
+
+    if (passwordForm.newPassword.length < 6) {
+      setErrorMessage("New password must be at least 6 characters long")
+      return
+    }
+
     setIsLoading(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsLoading(false)
-    setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" })
-    // Show success message
+    setErrorMessage("")
+    setSuccessMessage("")
+
+    try {
+      const response = await fetch("/api/settings/password", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(passwordForm),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setSuccessMessage("Password updated successfully!")
+        setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" })
+      } else {
+        setErrorMessage(result.error || "Failed to update password")
+      }
+    } catch (error) {
+      console.error("Password update error:", error)
+      setErrorMessage("Failed to update password")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handlePreferencesUpdate = async () => {
+    setIsLoading(true)
+    setErrorMessage("")
+    setSuccessMessage("")
+
+    try {
+      const response = await fetch("/api/settings/preferences", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(preferences),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setSuccessMessage("Preferences updated successfully!")
+      } else {
+        setErrorMessage(result.error || "Failed to update preferences")
+      }
+    } catch (error) {
+      console.error("Preferences update error:", error)
+      setErrorMessage("Failed to update preferences")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const settingsOptions = [
@@ -91,19 +247,51 @@ export default function SettingsPage() {
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Success/Error Messages */}
+        {successMessage && (
+          <Alert className="border-green-200 bg-green-50 text-green-800">
+            <CheckCircle className="h-4 w-4" />
+            <AlertDescription>{successMessage}</AlertDescription>
+          </Alert>
+        )}
+
+        {errorMessage && (
+          <Alert className="border-red-200 bg-red-50 text-red-800">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Alert>
+        )}
+
         {/* Profile Section */}
         <div className="flex items-center gap-4">
           <div className="relative">
             <Avatar className="h-20 w-20">
-              <AvatarImage src="/placeholder.svg?height=80&width=80" />
-              <AvatarFallback className="text-lg">UN</AvatarFallback>
+              <AvatarImage src={accountInfo.avatar || "/placeholder.svg?height=80&width=80"} />
+              <AvatarFallback className="text-lg">
+                {accountInfo.firstName.charAt(0)}
+                {accountInfo.lastName.charAt(0)}
+              </AvatarFallback>
             </Avatar>
-            <Button size="sm" className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0">
-              <Camera className="h-4 w-4" />
+            <Button
+              size="sm"
+              className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploadingAvatar}
+            >
+              {isUploadingAvatar ? <Upload className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
             </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/webp"
+              onChange={handleAvatarUpload}
+              className="hidden"
+            />
           </div>
           <div>
-            <h3 className="font-semibold text-lg">{accountInfo.firstName}</h3>
+            <h3 className="font-semibold text-lg">
+              {accountInfo.firstName} {accountInfo.lastName}
+            </h3>
             <p className="text-muted-foreground">{accountInfo.email}</p>
             <Badge variant="secondary" className="mt-1">
               Active
@@ -116,11 +304,12 @@ export default function SettingsPage() {
         {/* Form Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="firstName">First Name</Label>
+            <Label htmlFor="firstName">First Name *</Label>
             <Input
               id="firstName"
               value={accountInfo.firstName}
               onChange={(e) => setAccountInfo({ ...accountInfo, firstName: e.target.value })}
+              required
             />
           </div>
           <div className="space-y-2">
@@ -132,18 +321,21 @@ export default function SettingsPage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
+            <Label htmlFor="email">Email Address *</Label>
             <Input
               id="email"
               type="email"
               value={accountInfo.email}
               onChange={(e) => setAccountInfo({ ...accountInfo, email: e.target.value })}
+              required
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="contact">Contact Number</Label>
             <Input
               id="contact"
+              type="tel"
+              placeholder="+1 (555) 123-4567"
               value={accountInfo.contactNumber}
               onChange={(e) => setAccountInfo({ ...accountInfo, contactNumber: e.target.value })}
             />
@@ -152,7 +344,11 @@ export default function SettingsPage() {
 
         {/* Action Buttons */}
         <div className="flex gap-3 pt-4">
-          <Button onClick={handleAccountUpdate} disabled={isLoading} className="bg-coral-500 hover:bg-coral-600">
+          <Button
+            onClick={handleAccountUpdate}
+            disabled={isLoading || !accountInfo.firstName || !accountInfo.email}
+            className="bg-coral-500 hover:bg-coral-600"
+          >
             {isLoading ? "Updating..." : "Update Info"}
           </Button>
           <Button
@@ -185,14 +381,34 @@ export default function SettingsPage() {
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Success/Error Messages */}
+        {successMessage && (
+          <Alert className="border-green-200 bg-green-50 text-green-800">
+            <CheckCircle className="h-4 w-4" />
+            <AlertDescription>{successMessage}</AlertDescription>
+          </Alert>
+        )}
+
+        {errorMessage && (
+          <Alert className="border-red-200 bg-red-50 text-red-800">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Alert>
+        )}
+
         {/* Profile Section */}
         <div className="flex items-center gap-4">
           <Avatar className="h-16 w-16">
-            <AvatarImage src="/placeholder.svg?height=64&width=64" />
-            <AvatarFallback>UN</AvatarFallback>
+            <AvatarImage src={accountInfo.avatar || "/placeholder.svg?height=64&width=64"} />
+            <AvatarFallback>
+              {accountInfo.firstName.charAt(0)}
+              {accountInfo.lastName.charAt(0)}
+            </AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="font-semibold">{accountInfo.firstName}</h3>
+            <h3 className="font-semibold">
+              {accountInfo.firstName} {accountInfo.lastName}
+            </h3>
             <p className="text-muted-foreground">{accountInfo.email}</p>
           </div>
         </div>
@@ -202,13 +418,14 @@ export default function SettingsPage() {
         {/* Password Form */}
         <div className="space-y-4 max-w-md">
           <div className="space-y-2">
-            <Label htmlFor="currentPassword">Current Password</Label>
+            <Label htmlFor="currentPassword">Current Password *</Label>
             <div className="relative">
               <Input
                 id="currentPassword"
                 type={showCurrentPassword ? "text" : "password"}
                 value={passwordForm.currentPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                required
               />
               <Button
                 type="button"
@@ -223,13 +440,15 @@ export default function SettingsPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="newPassword">New Password</Label>
+            <Label htmlFor="newPassword">New Password *</Label>
             <div className="relative">
               <Input
                 id="newPassword"
                 type={showNewPassword ? "text" : "password"}
                 value={passwordForm.newPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                required
+                minLength={6}
               />
               <Button
                 type="button"
@@ -241,16 +460,18 @@ export default function SettingsPage() {
                 {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </Button>
             </div>
+            <p className="text-xs text-muted-foreground">Password must be at least 6 characters long</p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label htmlFor="confirmPassword">Confirm Password *</Label>
             <div className="relative">
               <Input
                 id="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
                 value={passwordForm.confirmPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                required
               />
               <Button
                 type="button"
@@ -267,7 +488,13 @@ export default function SettingsPage() {
 
         {/* Action Buttons */}
         <div className="flex gap-3 pt-4">
-          <Button onClick={handlePasswordUpdate} disabled={isLoading} className="bg-coral-500 hover:bg-coral-600">
+          <Button
+            onClick={handlePasswordUpdate}
+            disabled={
+              isLoading || !passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword
+            }
+            className="bg-coral-500 hover:bg-coral-600"
+          >
             {isLoading ? "Updating..." : "Update Password"}
           </Button>
           <Button
@@ -285,13 +512,36 @@ export default function SettingsPage() {
   const renderNotifications = () => (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Bell className="h-5 w-5" />
-          Notification Preferences
-        </CardTitle>
-        <CardDescription>Manage how you receive notifications</CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              Notification Preferences
+            </CardTitle>
+            <CardDescription>Manage how you receive notifications</CardDescription>
+          </div>
+          <Button variant="ghost" size="sm" onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Go Back
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Success/Error Messages */}
+        {successMessage && (
+          <Alert className="border-green-200 bg-green-50 text-green-800">
+            <CheckCircle className="h-4 w-4" />
+            <AlertDescription>{successMessage}</AlertDescription>
+          </Alert>
+        )}
+
+        {errorMessage && (
+          <Alert className="border-red-200 bg-red-50 text-red-800">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Alert>
+        )}
+
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
@@ -334,6 +584,13 @@ export default function SettingsPage() {
             />
           </div>
         </div>
+
+        {/* Save Preferences Button */}
+        <div className="pt-4">
+          <Button onClick={handlePreferencesUpdate} disabled={isLoading} className="bg-coral-500 hover:bg-coral-600">
+            {isLoading ? "Saving..." : "Save Preferences"}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   )
@@ -341,11 +598,19 @@ export default function SettingsPage() {
   const renderPrivacy = () => (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Shield className="h-5 w-5" />
-          Privacy & Security
-        </CardTitle>
-        <CardDescription>Manage your privacy and security settings</CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Privacy & Security
+            </CardTitle>
+            <CardDescription>Manage your privacy and security settings</CardDescription>
+          </div>
+          <Button variant="ghost" size="sm" onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Go Back
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
@@ -384,11 +649,19 @@ export default function SettingsPage() {
   const renderDataManagement = () => (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Download className="h-5 w-5" />
-          Data Management
-        </CardTitle>
-        <CardDescription>Export or delete your data</CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Download className="h-5 w-5" />
+              Data Management
+            </CardTitle>
+            <CardDescription>Export or delete your data</CardDescription>
+          </div>
+          <Button variant="ghost" size="sm" onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Go Back
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
@@ -435,7 +708,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto p-4 lg:p-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Settings Navigation */}
