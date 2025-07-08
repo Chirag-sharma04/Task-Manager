@@ -17,7 +17,7 @@ services:
 
   # Backend (Express.js)
   backend:
-    build: ./backend
+    build: .
     ports:
       - "5000:5000"
     environment:
